@@ -102,12 +102,12 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
     return { ...response, duration };
 };
 
-export const indexAllFiles = async (paths: string[]) => {
+export const indexAllFiles = async (paths: string[], pingClient = true) => {
     if (!(await search.client.ping().catch(() => null))) {
         console.error(`Elasticsearch is unreachable (${elastic.node})`);
         process.exit(1);
     }
-    if (!(await docuvisionClient.reachable())) {
+    if (pingClient && !(await docuvisionClient.reachable())) {
         console.error(`Docuvision is unreachable (${docuvision.host})`);
         process.exit(1);
     }
@@ -167,8 +167,9 @@ export const watchFolderAndIndex = (folder: string) => {
     // blacklist .gitignore - if the folder is created by docker the watcher fails
     const fsWatcher = chokidar.watch(folder, { ignored: '/data/.gitignore' });
 
-    let working = false;
     const fileQueue = [];
+    let working = false;
+    let pingOnce = true;
     let debounceTimer;
 
     const getDebounced = () =>
@@ -192,7 +193,8 @@ export const watchFolderAndIndex = (folder: string) => {
                 filename => fs.existsSync(filename) && fs.statSync(filename).isFile(),
             );
             if (pending.length) {
-                await indexAllFiles(pending);
+                await indexAllFiles(pending, pingOnce);
+                pingOnce = false;
             }
             working = false;
 
