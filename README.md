@@ -6,16 +6,19 @@
 <h1 align="center">
     Docuvision Studio
 </h1>
-  
-<p align="center">
-  Convert documents to data with <a href="https://docuvision.io/">Docuvision</a>, and make the results searchable with <a href="https://www.elastic.co/">elasticsearch</a>
-</p>
+
+- Indexes documents using [Docuvision](https://docuvision.io/) and stores the results in elastic search.
+- Explore the content using our web interface 
+
+> NOTE: This is a alpha release and we would like to encourage you to send us any [feedback](https://github.com/isarbits/docuvision). 
 
 ## Prerequisites
 
  - [Docker](https://www.docker.com/)  
 
  - [docker-compose](https://docs.docker.com/compose/)  
+
+ - [Docuvision API key](https://docuvision.io/index.html#contact-form)  
 
 ## Getting started
 
@@ -24,7 +27,7 @@ In a terminal, from the same folder as this README, run
 cp ./docker/.env.example ./docker/.env
 ```
 
-Edit the text file [`./docker/.env`](#FAQ) and replace `<put_your_api_key_here>` with your Docuvision [api key](https://docuvision.io/index.html#contact-form).
+Edit the text file [`./docker/.env`](#FAQ) and replace `<put_your_api_key_here>` with your Docuvision api key.
 ```
 COMPOSE_PROJECT_NAME=ds
 COMPOSE_CONVERT_WINDOWS_PATHS=1
