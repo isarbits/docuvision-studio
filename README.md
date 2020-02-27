@@ -23,7 +23,7 @@
 
 ## Getting started
 
-In a terminal, from the same folder as this README, run
+In a terminal, from the same folder as this README, copy the [`./docker/.env.example`](docker/.env.example) to `./docker/.env`:
 ```bash
 cp ./docker/.env.example ./docker/.env
 ```
@@ -48,15 +48,33 @@ Finally, start docker:
 cd ./docker && docker-compose up -d
 ```
 
-Any files placed in the `DATA_DIR` folder will be indexed automagically.  
+Any files placed in the [`index-root`](index-root) folder will be indexed automagically (see [advanced usage](#changing-the-default-indexer-folder) for configuration options).  
 
 That's it. The Docuvisionary client will start up (after a short wait) and you can visit http://localhost:8100 to see your search client
 
+## Troubleshooting
+
+ If you see the warning 
+ ```
+    WARNING: The DOCUVISION_APIKEY variable is not set. Defaulting to a blank string.
+ ```
+ it means you have not configured your Docuvision api key correctly. Make sure your api key is in the `docker/.env` file
+
+## FAQ
+
+ > Q: Where can I get a Docuvision API key?  
+ > A: You can [sign up](https://docuvision.io/index.html#contact-form) at https://docuvision.io/
+
+ > Q: Why can't I just add my API key to `.env.example` instead?  
+ > A: By convention, `.env` files are normally ignored in git, so you won't risk accidentally showing the world your super secret key. Any public environment variables can safely go into `.env.example` to be copied over.
+
 ## Advanced
 
-By default, the `DATA_DIR` variable is set to the `index-root` folder. You can change that to another location which will be watched for changes.
+### Changing the default indexer folder
 
-**\*\*WARNING\*\***: make sure the folder exists *before* starting the indexer, otherwise it will be created with the wrong permissions
+By default, the `DATA_DIR` variable in [`docker/.env`](docker/.env) is set to the [`index-root`](index-root) folder. You can change that to another location which will be watched for changes.
+
+**\*\*WARNING\*\***: make sure the folder exists *before* starting the indexer, otherwise it will be created with the wrong permissions and will only run once on start instead of watching for changes.
 
 Examples:
 
@@ -75,18 +93,15 @@ Windows paths also work
 DATA_DIR=C:\Users\docuvison-lover\Media\cat-folder
 ```
 
-## Troubleshooting
+### Editing images and modifying source modules
 
- If you see the warning 
- ```
-    WARNING: The DOCUVISION_APIKEY variable is not set. Defaulting to a blank string.
- ```
- it means you have not configured your Docuvision api key correctly. Make sure your api key is in the `docker/.env` file
+You can run images in development mode with:
+```
+cd ./docker && docker-compose -f docker-compose-dev.yml up -d
+```
 
-## FAQ
+In addition to rebuilding the containers from the source files, this mounts the build files for the client ([public](client/public) and [src](client/src)) and indexer.
 
- > Q: Where can I get a Docuvision API key?  
- > A: You can [sign up](https://docuvision.io/index.html#contact-form) at https://docuvision.io/
+The client image will automatically rebuild when the source files change.
 
- > Q: Why can't I just add my API key to `.env.example` instead?  
- > A: By convention, `.env` files are normally ignored in git, so you won't risk accidentally showing the world your super secret key. Any public environment variables can safely go into `.env.example` to be copied over.
+The indexer image will rebuild each time you build (`npm run build` or `npm run build -- -w`), but requires restarting the container (by design, as otherwise this would interrupt running processing).
