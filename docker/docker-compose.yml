@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  es:
+    container_name: ds_elastic
+    image: isarbits/es-kibana
+    volumes:
+      - esdata:/home/elasticsearch/elasticsearch/data
+    ports:
+      - "9200:9200" # elastic
+      - "5601:5601" # kibana
+
+  client:
+    container_name: ds_client
+    restart: always
+    build:
+      context: ../client
+    environment:
+      - BROWSER=none
+      - PORT=8100
+    ports:
+      - "8100:8100"
+    # development mode
+    # volumes:
+    #   - ../client/public:/opt/public
+    #   - ../client/src:/opt/src
+
+  indexer:
+    container_name: ds_indexer
+    restart: always
+    build:
+      context: ../node-cli
+    network_mode: host
+    environment:
+      - ELASTICSEARCH_NODE=http://localhost:9200
+      - DOCUVISION_APIKEY="${DOCUVISION_APIKEY}"
+    volumes:
+      - ${DATA_DIR}:/data
+
+volumes:
+  esdata:

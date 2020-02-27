@@ -1,0 +1,392 @@
+{
+  "docuvision": {
+    "aliases": {},
+    "mappings": {
+      "_doc": {
+        "properties": {
+          "createdAt": {
+            "type": "date"
+          },
+          "document": {
+            "properties": {
+              "completedDate": {
+                "type": "date"
+              },
+              "filename": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "fromPage": {
+                "type": "long"
+              },
+              "id": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "pageCount": {
+                "type": "long"
+              },
+              "pages": {
+                "properties": {
+                  "fullText": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "height": {
+                    "type": "long"
+                  },
+                  "imgUrl": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "pageNumber": {
+                    "type": "long"
+                  },
+                  "status": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "width": {
+                    "type": "long"
+                  },
+                  "words": {
+                    "properties": {
+                      "angle": {
+                        "type": "long"
+                      },
+                      "bb": {
+                        "type": "float"
+                      },
+                      "text": {
+                        "type": "text",
+                        "fields": {
+                          "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "status": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "toPage": {
+                "type": "long"
+              },
+              "uploadedDate": {
+                "type": "date"
+              },
+              "url": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "warnings": {
+                "properties": {
+                  "message": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "properties": {
+              "body": {
+                "properties": {
+                  "message": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "statusCode": {
+                    "type": "long"
+                  }
+                }
+              },
+              "completedDate": {
+                "type": "date"
+              },
+              "errors": {
+                "properties": {
+                  "message": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  }
+                }
+              },
+              "failed": {
+                "type": "boolean"
+              },
+              "filename": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "fromPage": {
+                "type": "long"
+              },
+              "id": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "pageCount": {
+                "type": "long"
+              },
+              "pages": {
+                "properties": {
+                  "errors": {
+                    "properties": {
+                      "message": {
+                        "type": "text",
+                        "fields": {
+                          "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "fullText": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "height": {
+                    "type": "long"
+                  },
+                  "imgUrl": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "pageNumber": {
+                    "type": "long"
+                  },
+                  "status": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "width": {
+                    "type": "long"
+                  },
+                  "words": {
+                    "properties": {
+                      "angle": {
+                        "type": "long"
+                      },
+                      "bb": {
+                        "type": "float"
+                      },
+                      "text": {
+                        "type": "text",
+                        "fields": {
+                          "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "status": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "statusCode": {
+                "type": "long"
+              },
+              "text": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "toPage": {
+                "type": "long"
+              },
+              "uploadedDate": {
+                "type": "date"
+              },
+              "url": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "warnings": {
+                "properties": {
+                  "message": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "processingTime": {
+            "type": "long"
+          },
+          "upload": {
+            "properties": {
+              "extension": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "filename": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "folder": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "path": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "size": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "creation_date": "1582628895840",
+        "number_of_shards": "5",
+        "number_of_replicas": "1",
+        "uuid": "tSw97visTyKPEhezJIrRDw",
+        "version": {
+          "created": "6050499"
+        },
+        "provided_name": "docuvision"
+      }
+    }
+  }
+}
