@@ -180,7 +180,7 @@ export const watchFolderAndIndex = (folder: string) => {
 
     const fsChangeHandler = async (_op: string, file: string) => {
         if (file) {
-            fileQueue.push(path.join(folder, file));
+            fileQueue.push(file);
         }
 
         await getDebounced();
@@ -189,7 +189,9 @@ export const watchFolderAndIndex = (folder: string) => {
             working = true;
             // osx emits "rename" _op event on every file change (delete, create, rename)
             // so as a workaround, we simply queue every "change", remove dupes, and assert the file exists
-            const pending = [...new Set(fileQueue.splice(0, fileQueue.length))].filter(filename => fs.existsSync(filename));
+            const pending = [...new Set(fileQueue.splice(0, fileQueue.length))].filter(
+                filename => fs.existsSync(filename) && fs.statSync(filename).isFile(),
+            );
             if (pending.length) {
                 await indexAllFiles(pending);
             }
