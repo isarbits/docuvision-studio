@@ -54,7 +54,11 @@ That's it. The Docuvisionary client will start up (after a short wait) and you c
 
 ## Advanced
 
-By default, the `DATA_DIR` variable is set to the `../index-root` folder (the folder will be created if it does not already exist). You can change that to another location which will be watched for changes eg:
+By default, the `DATA_DIR` variable is set to the `index-root` folder. You can change that to another location which will be watched for changes.
+
+**\*\*WARNING\*\***: make sure the folder exists *before* starting the indexer, otherwise it will be created with the wrong permissions
+
+Examples:
 
 Using the full path:
 ```
