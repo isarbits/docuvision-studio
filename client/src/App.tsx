@@ -99,7 +99,8 @@ const DocHitsListItem = (props: { bemBlocks: any; result: DocuvisionResult }) =>
                         className={bemBlocks.item('text')}
                         dangerouslySetInnerHTML={{
                             __html:
-                                ((source?.document?.pages as any)?.length && source?.document?.pages[0].fullText) ||
+                                ((source?.document?.pages as any)?.length &&
+                                    source?.document?.pages[0].fullText) ||
                                 `<pre>${JSON.stringify(source?.error, null, 2)}</pre>`,
                         }}
                     />
@@ -197,7 +198,11 @@ class App extends Component {
                             </ActionBar>
                             <ViewSwitcherHits
                                 hitsPerPage={12}
-                                highlightFields={['document.filename', 'document.pages.fullText', 'document.pages.words']}
+                                highlightFields={[
+                                    'document.filename',
+                                    'document.pages.fullText',
+                                    'document.pages.words',
+                                ]}
                                 hitComponents={[
                                     {
                                         key: 'list',
