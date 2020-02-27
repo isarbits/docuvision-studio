@@ -12,6 +12,8 @@ services:
 
   client:
     container_name: ds_client
+    build:
+      context: ../client
     image: isarbits/ds-client
     restart: always
     environment:
@@ -19,9 +21,14 @@ services:
       - PORT=8100
     ports:
       - "8100:8100"
+    volumes:
+      - ../client/public:/opt/public
+      - ../client/src:/opt/src
 
   indexer:
     container_name: ds_indexer
+    build:
+      context: ../node-cli
     image: isarbits/ds-indexer
     restart: always
     network_mode: host
@@ -30,6 +37,7 @@ services:
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
     volumes:
       - ${DATA_DIR}:/data
+      - ../node-cli/dist:/opt/dist
 
 volumes:
   esdata:
