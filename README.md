@@ -1,11 +1,12 @@
 <p align="center" >
     <img height="75" src="https://docuvision.io/images/logo.svg" alt="Docuvision">
-    <img height="75" src="https://images.contentstack.io/v3/assets/bltefdd0b53724fa2ce/blt280217a63b82a734/5bbdaacf63ed239936a7dd56/elastic-logo.svg" alt="Elasticsearch">
+    <br/>
+    <img height="50" src="https://images.contentstack.io/v3/assets/bltefdd0b53724fa2ce/blt280217a63b82a734/5bbdaacf63ed239936a7dd56/elastic-logo.svg" alt="Elasticsearch"> &nbsp;&nbsp;
+    <img height="50" src="https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png" alt="Docker">
+   
 </p>
 
-<h1 align="center">
-    Docuvision Studio
-</h1>
+# Docuvision Studio
 
 - Indexes documents using [Docuvision](https://docuvision.io/) and stores the results in elastic search.
 - Explore the content using our web interface 
