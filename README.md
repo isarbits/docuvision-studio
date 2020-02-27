@@ -43,9 +43,9 @@ DOCUVISION_APIKEY=7MQBbPTUin3xPVCGv*JdxKUf2X*Oo65yDyjBa&rEnri!MJ!ZYe6XRE9$cge5fY
 DATA_DIR=../index-root
 ```
 
-Finally, from the `docker` folder run:
+Finally, start docker:
 ```bash
-docker-compose up -d
+cd ./docker && docker-compose up -d
 ```
 
 Any files placed in the `DATA_DIR` folder will be indexed automagically.  

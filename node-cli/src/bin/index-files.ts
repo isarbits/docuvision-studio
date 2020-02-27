@@ -165,7 +165,8 @@ export const indexAllFiles = async (paths: string[]) => {
 export const watchFolderAndIndex = (folder: string) => {
     console.log(`Starting folderwatcher ${folder}`);
 
-    const fsWatcher = chokidar.watch(folder);
+    // blacklist .gitignore - if the folder is created by docker the watcher fails
+    const fsWatcher = chokidar.watch(folder, { ignored: '/data/.gitignore' });
 
     let working = false;
     const fileQueue = [];
