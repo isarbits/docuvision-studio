@@ -33,7 +33,7 @@ services:
     network_mode: host
     environment:
       - ELASTICSEARCH_NODE=http://localhost:9200
-      - DOCUVISION_APIKEY="${DOCUVISION_APIKEY}"
+      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
     volumes:
       - ${DATA_DIR}:/data
 

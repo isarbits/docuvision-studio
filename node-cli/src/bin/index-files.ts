@@ -121,7 +121,6 @@ export const indexAllFiles = async (paths: string[]) => {
     console.log(`Started ${new Date().toUTCString()}`);
 
     for (const file of walkPaths(paths)) {
-        await new Promise(res => setTimeout(res, 100));
         progress.total++;
         progress.pending++;
         progress.print();
