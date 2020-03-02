@@ -1,0 +1,7 @@
+**/.git
+**/dist
+**/build
+**/node_modules
+**/.npm-scripts
+**/.vscode
+**/docs

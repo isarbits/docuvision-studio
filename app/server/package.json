@@ -1,0 +1,43 @@
+{
+    "name": "docuvision-studio-server",
+    "version": "0.0.1",
+    "private": true,
+    "description": "Simple backend for client",
+    "author": "Isarbits GmbH",
+    "license": "MIT",
+    "scripts": {
+        "preinstall": "node .npm-scripts/preinstall.js",
+        "build": "tsc -p tsconfig.build.json",
+        "format": "prettier --write -l \"src/**/*.ts\" && eslint --fix src/ --ext .ts",
+        "watch": "tsc-watch --preserveWatchOutput --onSuccess 'npm start'",
+        "start": "cd dist && node src/main.js"
+    },
+    "dependencies": {
+        "@nestjs/common": "^6.11.8",
+        "@nestjs/core": "^6.11.8",
+        "@nestjs/microservices": "^6.11.8",
+        "@nestjs/platform-express": "^6.11.8",
+        "@nestjs/serve-static": "^2.0.0",
+        "class-transformer": "^0.2.3",
+        "class-validator": "^0.11.0",
+        "config": "^3.3.0",
+        "dotenv": "^8.2.0",
+        "reflect-metadata": "^0.1.13",
+        "rxjs": "^6.5.4",
+        "source-map-support": "^0.5.16",
+        "uuid": "^7.0.1"
+    },
+    "devDependencies": {
+        "@types/node": "^13.7.6",
+        "@typescript-eslint/eslint-plugin": "^2.19.0",
+        "@typescript-eslint/parser": "^2.19.0",
+        "eslint": "^6.8.0",
+        "prettier": "^1.18.2",
+        "tsc-watch": "^4.1.0",
+        "typescript": "^3.7.5"
+    },
+    "engines": {
+        "node": ">=12",
+        "npm": ">=6"
+    }
+}

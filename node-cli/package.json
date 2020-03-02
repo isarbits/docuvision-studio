@@ -8,6 +8,7 @@
     "main": "dist/index.js",
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
+        "watch": "npm run build -- -w",
         "search": "node dist/src/index.js find",
         "index": "node dist/src/index.js index",
         "apikey": "node dist/src/index.js apikey",

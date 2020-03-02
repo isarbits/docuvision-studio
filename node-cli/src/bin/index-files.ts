@@ -1,4 +1,4 @@
-import { docuvision, elastic } from 'config';
+import { docuvision, elastic, paths } from 'config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Client as DocuClient } from '../docuvision/docuvision';
@@ -8,6 +8,8 @@ import { hashFile } from '../lib/hash';
 import { Progress, walkPaths } from '../lib/utils';
 import { Search } from '../search/search';
 import * as chokidar from 'chokidar';
+import { logError, log } from '../logging/es-log';
+import { FileSystemStorageStatic } from '../storage/filesystem';
 
 const index = elastic.index || 'docuvision';
 
@@ -56,6 +58,8 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
     });
     const duration = Date.now() - start;
 
+    const fullPath = path.resolve(file);
+
     const document = {
         id: hash,
         createdAt: new Date(),
@@ -63,11 +67,12 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
         document: null,
         processingTime: duration,
         upload: {
-            path: file,
-            folder: path.dirname(file),
-            filename: path.basename(file),
-            extension: path.extname(file),
-            size: fs.statSync(file).size,
+            path: fullPath,
+            folder: path.dirname(fullPath),
+            filename: path.basename(fullPath),
+            extension: path.extname(fullPath),
+            size: fs.statSync(fullPath).size,
+            md5: hash,
         },
     };
 
@@ -90,10 +95,22 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
                 pages.map(page => {
                     const body = {
                         ...document,
+                        id: `${document.id}_${page.pageNumber}`,
                         document: doc,
                         page,
                     };
-                    return search.index({ index: `${index}_page`, body }).catch(console.error);
+
+                    return Promise.all([
+                        docuvisionClient
+                            .getPageImage(page.imgUrl)
+                            .then(({ body }) => {
+                                return FileSystemStorageStatic.putFile(`${paths.generatedFiles}/${document.id}/${page.pageNumber}.jpg`, body, {
+                                    encoding: 'binary',
+                                });
+                            })
+                            .catch(logError),
+                        search.index({ index: `${index}_page`, body }).catch(logError),
+                    ]);
                 }),
             );
         }
@@ -149,6 +166,7 @@ export const indexAllFiles = async (paths: string[], pingClient = true) => {
                 progress.failed++;
                 progress.time.each[file] = { time: Date.now() - reqStart, failed: true };
                 progress.print([`error processing ${file}`, e]);
+                logError(e);
             })
             .then(() => progress.print());
 
@@ -157,12 +175,16 @@ export const indexAllFiles = async (paths: string[], pingClient = true) => {
 
     await Promise.all(promises);
 
+    log(JSON.stringify(progress));
+
     console.log(`\n\nFinished processing in ${(progress.elapsed / 1000).toFixed(2)}s`);
 };
 
 // folders.foreach(...watch)
 export const watchFolderAndIndex = (folder: string) => {
-    console.log(`Starting folderwatcher ${folder}`);
+    console.log(`Docuvision: ${docuvision.host}`);
+    console.log(`Elastic: ${elastic.node}`);
+    console.log(`Starting folderwatcher: ${folder}\n`);
 
     // blacklist .gitignore - if the folder is created by docker the watcher fails
     const fsWatcher = chokidar.watch(folder, { ignored: '/data/.gitignore' });

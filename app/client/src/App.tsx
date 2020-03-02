@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { PageHitListItem } from './components/PageHitListItem/PageHitListItem';
+import { PageHitGridItem } from './components/PageHitGridItem/PageHitGridItem';
 import {
     ActionBar,
     ActionBarRow,
@@ -26,107 +28,12 @@ import {
     ViewSwitcherToggle,
 } from 'searchkit';
 import './index.scss';
-import { DocuvisionHit, DocuvisionResult, EsTypeOf } from './mappings/interfaces';
 
-const host = '/';
-const searchkit = new SearchkitManager(host);
-
-const DocHitsGridItem = (props: any) => {
-    const { bemBlocks, result } = props;
-    let url = 'http://www.imdb.com/title/' + result._source.imdbId;
-    const source = { ...result._source, ...result.highlight };
-    return (
-        <div className={bemBlocks.item().mix(bemBlocks.container('item'))} data-qa="hit">
-            <a href={url} target="_blank" rel="noopener noreferrer">
-                <div
-                    data-qa="title"
-                    className={bemBlocks.item('title')}
-                    dangerouslySetInnerHTML={{ __html: source.title }}
-                ></div>
-            </a>
-        </div>
-    );
-};
-
-const DocHitsListItem = (props: { bemBlocks: any; result: DocuvisionResult }) => {
-    const { bemBlocks, result } = props;
-    const source: DocuvisionHit = { ...result._source, ...result.highlight };
-
-    const onClick = div => div.currentTarget.toggleAttribute('expanded');
-    const deleteDocument = (id: string) => () => {
-        if (
-            window.confirm('Are you sure you want to remove this document? This cannot be undone.')
-        ) {
-            window
-                .fetch(`/_doc/${id}`, { method: 'DELETE' })
-                .then(() => window.location.reload())
-                .catch(console.error);
-        }
-    };
-
-    return (
-        <div style={{ position: 'relative' }} id={result._id}>
-            <div
-                className={bemBlocks.item().mix(bemBlocks.container('item'))}
-                data-qa="hit"
-                onClick={onClick}
-            >
-                <div className={bemBlocks.item('details')}>
-                    <h2
-                        className={bemBlocks.item('title')}
-                        dangerouslySetInnerHTML={{ __html: source?.upload?.filename as EsTypeOf }}
-                    />
-                    <h3 className={bemBlocks.item('subtitle')}>
-                        <strong style={{ color: source?.document?.status ? 'green' : 'red' }}>
-                            {source?.document?.status || 'failed'}
-                        </strong>
-                        &nbsp;
-                        <span>{source?.createdAt}</span>&nbsp;&nbsp;
-                        <span>{source.upload.folder}</span>&nbsp;|&nbsp;
-                        <span>{source.upload.size} B</span>
-                        {source?.document?.pageCount ? (
-                            <>
-                                &nbsp;|&nbsp;
-                                <span>
-                                    {source.document.pageCount} page
-                                    {+source.document.pageCount !== 1 ? 's' : null}
-                                </span>
-                            </>
-                        ) : null}
-                    </h3>
-
-                    <div
-                        className={bemBlocks.item('text')}
-                        dangerouslySetInnerHTML={{
-                            __html:
-                                ((source?.document?.pages as any)?.length &&
-                                    source?.document?.pages[0].fullText) ||
-                                `<pre>${JSON.stringify(source?.error, null, 2)}</pre>`,
-                        }}
-                    />
-                </div>
-            </div>
-            <button
-                style={{
-                    backgroundColor: 'red',
-                    color: 'white',
-                    position: 'absolute',
-                    bottom: '40px',
-                    right: 0,
-                    zIndex: 2,
-                    cursor: 'pointer',
-                }}
-                onClick={deleteDocument(result._id)}
-            >
-                Delete
-            </button>
-        </div>
-    );
-};
+const baseUrl = '/v1';
+const defaultIndex = 'docuvision_page';
+const searchkit = new SearchkitManager(`${baseUrl}/search/${defaultIndex}`);
 
 class App extends Component {
-    public state = { rerender: false };
-
     render() {
         return (
             <SearchkitProvider searchkit={searchkit}>
@@ -136,10 +43,12 @@ class App extends Component {
                         <SearchBox
                             autofocus={true}
                             searchOnChange={true}
+                            placeholder="Search pages"
                             prefixQueryFields={[
                                 'document.filename^1',
+                                'document.upload.path^1',
                                 'document.pages.fullText^2',
-                                'document.pages.words',
+                                'document.pages.words^2',
                             ]}
                         />
                     </TopBar>
@@ -158,11 +67,17 @@ class App extends Component {
                                 field="document.status.keyword"
                                 size={10}
                             />
+                            <RefinementListFilter
+                                id="filename"
+                                title="Filename"
+                                field="document.filename.keyword"
+                                size={10}
+                            />
                             <DynamicRangeFilter
                                 field="document.pageCount"
                                 showHistogram={true}
                                 id="pageCount"
-                                title="Pages"
+                                title="Page Count"
                             />
                         </SideBar>
                         <LayoutResults>
@@ -202,18 +117,19 @@ class App extends Component {
                                     'document.filename',
                                     'document.pages.fullText',
                                     'document.pages.words',
+                                    'document.upload.path',
                                 ]}
                                 hitComponents={[
                                     {
                                         key: 'list',
                                         title: 'List',
-                                        itemComponent: DocHitsListItem,
+                                        itemComponent: PageHitListItem,
                                         defaultOption: true,
                                     },
                                     {
                                         key: 'grid',
                                         title: 'Grid',
-                                        itemComponent: DocHitsGridItem,
+                                        itemComponent: PageHitGridItem,
                                     },
                                 ]}
                                 scrollTo="body"
