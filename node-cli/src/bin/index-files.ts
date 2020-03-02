@@ -9,7 +9,7 @@ import { Progress, walkPaths } from '../lib/utils';
 import { Search } from '../search/search';
 import * as chokidar from 'chokidar';
 import { logError, log } from '../logging/es-log';
-import { FileSystemStorageStatic } from '../storage/filesystem';
+import { FileSystemStatic } from '../storage/filesystem';
 
 const index = elastic.index || 'docuvision';
 
@@ -104,7 +104,7 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
                         docuvisionClient
                             .getPageImage(page.imgUrl)
                             .then(({ body }) => {
-                                return FileSystemStorageStatic.putFile(`${paths.generatedFiles}/${document.id}/${page.pageNumber}.jpg`, body, {
+                                return FileSystemStatic.putFile(`${paths.generatedFiles}/${document.id}/${page.pageNumber}.jpg`, body, {
                                     encoding: 'binary',
                                 });
                             })

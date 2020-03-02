@@ -1,15 +1,13 @@
 import { StorageInterface } from './storage.interface';
 import * as fs from 'fs';
 import * as path from 'path';
-import { log } from '../logging/es-log';
 
-class FileSystemStorage implements StorageInterface {
+class FileSystem implements StorageInterface {
     public getFile(filename: string) {
         return fs.promises.readFile(filename);
     }
 
     public putFile(filename: string, body: Buffer, options?: any) {
-        log(filename);
         fs.mkdirSync(path.dirname(filename), { recursive: true });
 
         return fs.promises
@@ -30,4 +28,4 @@ class FileSystemStorage implements StorageInterface {
     }
 }
 
-export const FileSystemStorageStatic = new FileSystemStorage();
+export const FileSystemStatic = new FileSystem();

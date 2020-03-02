@@ -3,7 +3,7 @@ import { elasticsearch } from 'config';
 
 @Injectable()
 export class ElasticIndexPipe implements PipeTransform<string, string> {
-    transform(value: string, _metadata: ArgumentMetadata): string {
-        return `${elasticsearch.node}/${value}/_search`;
+    transform(esIndex: string, _metadata: ArgumentMetadata): string {
+        return `${elasticsearch.node}/${esIndex}/_search`;
     }
 }

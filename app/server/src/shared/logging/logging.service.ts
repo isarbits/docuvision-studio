@@ -6,7 +6,6 @@ import { LoggingModel } from './logging.model';
 interface LogLevels {
     [source: string]: string;
 }
-export const LOGGING_LEVELS = 'default:all';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggingService {
@@ -15,7 +14,7 @@ export class LoggingService {
     private source: string;
 
     constructor(@Inject(INQUIRER) source?: string | object) {
-        this.source = typeof source === 'string' ? source : source?.constructor?.name;
+        this.source = typeof source === 'string' ? source : source?.constructor?.name || 'unknown';
         this.parseLogLevel(logging.logLevel || 'default:all');
     }
 
@@ -60,6 +59,18 @@ export class LoggingService {
     public resetLogLevel() {
         this.logLevels = { ...this.originalLogLevels };
     }
+
+    public parseLogLevel(levels: string) {
+            const delimiter = ';';
+            this.logLevels = {
+                default: 'all',
+            };
+            for (const sourceLevel of levels.split(delimiter)) {
+                const [source, levels] = sourceLevel.split(':');
+                this.logLevels[source] = levels;
+            }
+            this.originalLogLevels = { ...this.logLevels };
+        }
 
     private sendLog(type: string, source: string | null, msg: string | object, _options?: string | Partial<LoggingModel>): boolean {
         if (!this.shouldLog(source, type)) {
@@ -134,17 +145,5 @@ export class LoggingService {
             };
         }
         return err;
-    }
-
-    private parseLogLevel(levels: string) {
-        const delimiter = ';';
-        this.logLevels = {
-            default: 'all',
-        };
-        for (const sourceLevel of levels.split(delimiter)) {
-            const [source, levels] = sourceLevel.split(':');
-            this.logLevels[source] = levels;
-        }
-        this.originalLogLevels = { ...this.logLevels };
     }
 }

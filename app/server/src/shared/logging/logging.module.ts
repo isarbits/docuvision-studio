@@ -1,10 +1,8 @@
-import { Module, Logger } from '@nestjs/common';
-import { LoggingService, LOGGING_LEVELS } from './logging.service';
-
-const providers = [LoggingService, Logger, { provide: 'LOGGING_LEVELS', useValue: LOGGING_LEVELS }];
+import { Module } from '@nestjs/common';
+import { LoggingService } from './logging.service';
 
 @Module({
-    providers,
-    exports: [...providers],
+    providers: [LoggingService],
+    exports: [LoggingService],
 })
 export class LoggingModule {}
