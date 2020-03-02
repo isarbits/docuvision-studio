@@ -10,34 +10,35 @@ services:
       - "9200:9200" # elastic
       - "5601:5601" # kibana
 
-  client:
-    container_name: ds_client
+  app:
+    container_name: ds_app
     build:
-      context: ../client
-    image: isarbits/ds-client
+      context: ../app
+    image: isarbits/docuvision-studio-app
     restart: always
     environment:
-      - BROWSER=none
       - PORT=8100
+      - ELASTICSEARCH_NODE=http://ds_elastic:9200
+      - NODE_ENV=production
     ports:
       - "8100:8100"
     volumes:
-      - ../client/public:/opt/public
-      - ../client/src:/opt/src
+      - "${GENERATED_DIR}:/opt/dist/app/generated-files"
 
   indexer:
     container_name: ds_indexer
     build:
       context: ../node-cli
-    image: isarbits/ds-indexer
+    image: isarbits/docuvision-studio-indexer
     restart: always
     network_mode: host
     environment:
       - ELASTICSEARCH_NODE=http://localhost:9200
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+      - DOCUVISION_HOST=${DOCUVISION_HOST}
     volumes:
-      - ${DATA_DIR}:/data
-      - ../node-cli/dist:/opt/dist
+      - "${INPUT_DIR}:/data"
+      - "${GENERATED_DIR}:/generated-files"
 
 volumes:
   esdata:

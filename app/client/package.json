@@ -8,6 +8,7 @@
     "@types/react-dom": "^16.9.0",
     "http-proxy-middleware": "^1.0.0",
     "node-sass": "^4.13.1",
+    "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -18,11 +19,11 @@
   "dependencies": {},
   "scripts": {
     "start": "react-scripts start",
+    "watch": "nodemon",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --write -l \"./src/**/*.{ts,tsx,json,scss}\"",
-    "lint": "eslint --fix src/ --ext .ts,.tsx",
+    "format": "prettier --write -l \"./src/**/*.{ts,tsx,json,scss}\" && eslint --fix src/ --ext .ts,.tsx",
     "cold": "sed -i \"s:require.resolve('react-dev-utils/webpackHotDevClient'):null:\" node_modules/react-scripts/config/webpack.config.js"
   },
   "eslintConfig": {
@@ -40,5 +41,17 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:9200/docuvision"
+  "proxy": "http://localhost:9200/",
+  "nodemonConfig": {
+    "watch": [
+      "src",
+      "public"
+    ],
+    "ext": "ts,tsx,scss",
+    "ignore": [
+      "src/**/*.spec.ts"
+    ],
+    "exec": "npm run build",
+    "delay": "200"
+  }
 }

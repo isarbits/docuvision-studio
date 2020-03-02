@@ -18,6 +18,7 @@ switch (process.argv[2]) {
             if (args.length > 1) {
                 throw new Error('Watch mode only supports 1 folder at this time');
             }
+            process.on('SIGTERM', () => process.exit(0));
             watchFolderAndIndex(args[0]);
         } else {
             indexAllFiles(args);
