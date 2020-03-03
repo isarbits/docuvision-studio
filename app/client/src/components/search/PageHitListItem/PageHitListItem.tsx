@@ -23,7 +23,9 @@ export class PageHitListItem extends React.Component<{
             }
         };
 
-        const imagePath = `${(source.document.id as EsTypeOf as string).replace('_', '/')}/${source.page.pageNumber}.jpg`;
+        const imagePath = `${((source.document.id as EsTypeOf) as string).replace('_', '/')}/${
+            source.page.pageNumber
+        }.jpg`;
 
         return (
             <div

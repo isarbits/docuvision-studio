@@ -7,7 +7,7 @@ import { indexAllFiles } from './index-files';
 export const watchFolderAndIndex = (folder: string) => {
     console.log(`Docuvision: ${docuvision.host}`);
     console.log(`Elastic: ${elastic.node}`);
-    if (!!process.env.ISWIN) {
+    if (process.env.ISWIN) {
         console.warn('Polling enabled on windows - may result in performance issues');
     }
 
