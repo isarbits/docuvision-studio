@@ -1,5 +1,18 @@
 #root {
     .sk-layout {
+        .title {
+            display: flex;
+            color: #fff;
+            flex: 0 0 250px;
+            align-items: center;
+            justify-content: space-between;
+            margin-right: 1rem;
+
+            a, a img {
+                height: 90%;
+            }
+        }
+
         .sk-layout__top-bar {
             background: #104200;
         }

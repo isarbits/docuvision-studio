@@ -1,27 +1,6 @@
 import React from 'react';
-import {
-    ActionBar,
-    ActionBarRow,
-    DynamicRangeFilter,
-    GroupedSelectedFilters,
-    HitsStats,
-    Layout,
-    LayoutBody,
-    LayoutResults,
-    NoHits,
-    Pagination,
-    RefinementListFilter,
-    ResetFilters,
-    SearchBox,
-    SearchkitManager,
-    SearchkitProvider,
-    SideBar,
-    SortingSelector,
-    TopBar,
-    ViewSwitcherHits,
-    ViewSwitcherToggle,
-} from 'searchkit';
-import { baseUrl, defaultIndex } from '../../config';
+import { ActionBar, ActionBarRow, DynamicRangeFilter, GroupedSelectedFilters, HitsStats, Layout, LayoutBody, LayoutResults, NoHits, Pagination, RefinementListFilter, ResetFilters, SearchBox, SearchkitManager, SearchkitProvider, SideBar, SortingSelector, TopBar, ViewSwitcherHits, ViewSwitcherToggle } from 'searchkit';
+import { baseUrl, defaultIndex, githubRepo } from '../../config';
 import { PageHitGridItem } from './PageHitGridItem/PageHitGridItem';
 import { PageHitListItem } from './PageHitListItem/PageHitListItem';
 import './search.scss';
@@ -36,7 +15,12 @@ export class Search extends React.Component<{}> {
             <SearchkitProvider searchkit={this.searchkit}>
                 <Layout>
                     <TopBar>
-                        <div className="my-logo">Docuvision Studio</div>
+                        <div className="title">
+                            <span>Docuvision Studio</span>
+                            <a href={githubRepo} target="_blank" rel="noopener noreferrer">
+                                <img src="GitHub-Mark-Light-64px.png" />
+                            </a>
+                        </div>
                         <SearchBox
                             autofocus={true}
                             searchOnChange={true}
