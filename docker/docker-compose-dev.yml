@@ -24,6 +24,7 @@ services:
       - "8100:8100"
     volumes:
       - "${GENERATED_DIR}:/opt/dist/static/public"
+
       - ../app/server/dist:/opt/dist
       - ../app/client/build:/client/build
     command: npx nodemon --watch dist --exec 'cd dist && node src/main.js'
@@ -43,6 +44,7 @@ services:
     volumes:
       - "${INPUT_DIR}:/data"
       - "${GENERATED_DIR}:/generated-files"
+
       - ../indexer-cli/dist:/opt/dist
     command: npx nodemon --exec 'node ./src/index.js index --watch /data'
 

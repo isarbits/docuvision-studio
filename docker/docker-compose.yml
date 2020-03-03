@@ -21,7 +21,7 @@ services:
     ports:
       - "8100:8100"
     volumes:
-      - "${GENERATED_DIR}:/opt/dist/app/generated-files"
+      - "${GENERATED_DIR}:/opt/dist/static/public"
 
   indexer:
     container_name: ds_indexer
@@ -30,6 +30,7 @@ services:
     network_mode: host
     environment:
       - ELASTICSEARCH_NODE=http://localhost:9200
+      - DOCUVISION_HOST=${DOCUVISION_HOST}
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       - ISWIN=${WINDIR}
     volumes:
