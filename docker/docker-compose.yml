@@ -31,6 +31,7 @@ services:
     environment:
       - ELASTICSEARCH_NODE=http://localhost:9200
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+      - ISWIN=${WINDIR}
     volumes:
       - "${INPUT_DIR}:/data"
       - "${GENERATED_DIR}:/generated-files"

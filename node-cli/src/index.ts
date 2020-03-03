@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { RequestParams } from '@elastic/elasticsearch';
-import { indexAllFiles, watchFolderAndIndex } from './bin/index-files';
+import { indexAllFiles } from './bin/index-files';
 import { search } from './bin/search-indexed';
+import { watchFolderAndIndex } from './bin/watch';
 import { Client } from './docuvision/docuvision';
 import { Params } from './interfaces';
 
@@ -16,7 +17,8 @@ switch (process.argv[2]) {
         if (args.includes('-w') || args.includes('--watch')) {
             args = args.filter(a => !/-w|--watch/.test(a));
             if (args.length > 1) {
-                throw new Error('Watch mode only supports 1 folder at this time');
+                console.error('Watch mode only supports 1 folder at this time');
+                process.exit(1);
             }
             process.on('SIGTERM', () => process.exit(0));
             watchFolderAndIndex(args[0]);

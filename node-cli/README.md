@@ -1,11 +1,12 @@
 <p align="center">
-    <img width="200" height="200" src="https://docuvision.io/images/logo.svg" alt="Docuvision">
-    <img width="200" height="200" src="https://cdn.worldvectorlogo.com/logos/nodejs-icon.svg" alt="NodeJs">
+    <img height="75" src="https://docuvision.io/images/logo.svg" alt="Docuvision">
+    <br/>
+    <img height="75" src="https://cdn.worldvectorlogo.com/logos/nodejs-icon.svg" alt="NodeJs">
+    <img height="75" src="https://images.contentstack.io/v3/assets/bltefdd0b53724fa2ce/blt280217a63b82a734/5bbdaacf63ed239936a7dd56/elastic-logo.svg" alt="Elasticsearch">
 </p>
-<span>TODO: get better Docuvision img</span>
 
 <h1 align="center">
-    DocuSearch NodeJS CLI
+    Docuvision Studio NodeJS file indexer CLI
 </h1>
   
 <p align="center">
@@ -13,12 +14,6 @@
 </p>
 
 ## Prerequisites
-
- - [Docker](https://www.docker.com/)  
-
-
- - [docker-compose](https://docs.docker.com/compose/)  
-
 
  - [NodeJS](https://nodejs.org/en/) (minimum: node 10, recommended: 12 or above)  
 
@@ -29,9 +24,6 @@ From the command line of choice, in this directory:
 ```bash
 # Install dependencies
 npm install
-
-# Start docker
-npm run docker
 
 # Copy environment varaibles file
 cp .env.example .env

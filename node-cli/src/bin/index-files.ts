@@ -6,9 +6,8 @@ import { DocuvisionClient } from '../interfaces';
 import '../lib/errors';
 import { hashFile } from '../lib/hash';
 import { Progress, walkPaths } from '../lib/utils';
+import { log, logError } from '../logging/es-log';
 import { Search } from '../search/search';
-import * as chokidar from 'chokidar';
-import { logError, log } from '../logging/es-log';
 import { FileSystemStatic } from '../storage/filesystem';
 
 const index = elastic.index || 'docuvision';
@@ -42,8 +41,8 @@ const uploadAndWaitForCompletion = async (file: string): Promise<DocuvisionClien
 };
 
 const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResponse & { duration: number; failed?: boolean }> => {
-    const hash = await hashFile(file);
-    if (await idExists(hash)) {
+    const md5 = await hashFile(file);
+    if (await idExists(md5)) {
         return null;
     }
 
@@ -61,7 +60,7 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
     const fullPath = path.resolve(file);
 
     const document = {
-        id: hash,
+        id: md5,
         createdAt: new Date(),
         error: null,
         document: null,
@@ -72,7 +71,7 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
             filename: path.basename(fullPath),
             extension: path.extname(fullPath),
             size: fs.statSync(fullPath).size,
-            md5: hash,
+            md5,
         },
     };
 
@@ -178,58 +177,6 @@ export const indexAllFiles = async (paths: string[], pingClient = true) => {
     log(JSON.stringify(progress));
 
     console.log(`\n\nFinished processing in ${(progress.elapsed / 1000).toFixed(2)}s`);
-};
-
-// folders.foreach(...watch)
-export const watchFolderAndIndex = (folder: string) => {
-    console.log(`Docuvision: ${docuvision.host}`);
-    console.log(`Elastic: ${elastic.node}`);
-    console.log(`Starting folderwatcher: ${folder}\n`);
-
-    // blacklist .gitignore - if the folder is created by docker the watcher fails
-    const fsWatcher = chokidar.watch(folder, { ignored: '/data/.gitignore' });
-
-    const fileQueue = [];
-    let working = false;
-    let pingOnce = true;
-    let debounceTimer;
-
-    const getDebounced = () =>
-        new Promise(res => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => res(clearTimeout(debounceTimer)), 100);
-        });
-
-    const fsChangeHandler = async (_op: string, file: string) => {
-        if (file) {
-            fileQueue.push(file);
-        }
-
-        await getDebounced();
-
-        if (!working) {
-            working = true;
-            // osx emits "rename" _op event on every file change (delete, create, rename)
-            // so as a workaround, we simply queue every "change", remove dupes, and assert the file exists
-            const pending = [...new Set(fileQueue.splice(0, fileQueue.length))].filter(
-                filename => fs.existsSync(filename) && fs.statSync(filename).isFile(),
-            );
-            if (pending.length) {
-                await indexAllFiles(pending, pingOnce);
-                pingOnce = false;
-            }
-            working = false;
-
-            // if events were fired while we were processing, just re-fire
-            if (fileQueue.length) {
-                fsWatcher.emit('all', 'change', null);
-            }
-        }
-    };
-
-    fsWatcher.on('all', fsChangeHandler);
-    // also launch once on start
-    fsWatcher.emit('all', 'change', '/');
 };
 
 export const dev = {
