@@ -103,7 +103,7 @@ const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResp
                         docuvisionClient
                             .getPageImage(page.imgUrl)
                             .then(({ body }) => {
-                                return FileSystemStatic.putFile(`${paths.generatedFiles}/${document.id}/${page.pageNumber}.jpg`, body, {
+                                return FileSystemStatic.putFile(`${paths.generatedFiles}/${doc.id}/${page.pageNumber}.jpg`, body, {
                                     encoding: 'binary',
                                 });
                             })
