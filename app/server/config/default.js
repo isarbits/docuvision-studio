@@ -13,6 +13,7 @@ module.exports = {
         projectRoot: path.resolve(__dirname, '..'),
         tempPath: path.resolve(__dirname, '..', 'tmp'),
         staticDir: path.resolve(__dirname, '../../../client/build'),
+        assetsDir: path.resolve(__dirname, '../static'),
     },
     logging: {
         logLevel: 'default:all;' + process.env.LOG_LEVELS ?? '',

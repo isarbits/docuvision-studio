@@ -61,16 +61,16 @@ export class LoggingService {
     }
 
     public parseLogLevel(levels: string) {
-            const delimiter = ';';
-            this.logLevels = {
-                default: 'all',
-            };
-            for (const sourceLevel of levels.split(delimiter)) {
-                const [source, levels] = sourceLevel.split(':');
-                this.logLevels[source] = levels;
-            }
-            this.originalLogLevels = { ...this.logLevels };
+        const delimiter = ';';
+        this.logLevels = {
+            default: 'all',
+        };
+        for (const sourceLevel of levels.split(delimiter)) {
+            const [source, levels] = sourceLevel.split(':');
+            this.logLevels[source] = levels;
         }
+        this.originalLogLevels = { ...this.logLevels };
+    }
 
     private sendLog(type: string, source: string | null, msg: string | object, _options?: string | Partial<LoggingModel>): boolean {
         if (!this.shouldLog(source, type)) {

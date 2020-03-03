@@ -10,7 +10,7 @@ import { LoggingService } from './shared/logging/logging.service';
 
 const log = new LoggingService('App');
 
-export const configureApplication = async app => {
+export const configureApplication = async (app: NestExpressApplication) => {
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     app.setGlobalPrefix(config.apiPrefix);
 
@@ -19,6 +19,8 @@ export const configureApplication = async app => {
     app.useGlobalFilters(new BadRequestExceptionFilter(reflector));
 
     app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector), new ErrorsInterceptor());
+
+    app.useStaticAssets(config.paths.assetsDir);
 
     app.useGlobalPipes(
         new ValidationPipe({

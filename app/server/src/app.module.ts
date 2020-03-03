@@ -7,7 +7,12 @@ import { SearchModule } from './modules/search/search.module';
 import { SharedModule } from './shared/shared.module';
 
 @Module({
-    imports: [ServeStaticModule.forRoot({ rootPath: paths.staticDir }), SharedModule, SearchModule, DocumentsModule],
+    imports: [
+        ServeStaticModule.forRoot({ rootPath: paths.staticDir }),
+        SharedModule,
+        SearchModule,
+        DocumentsModule,
+    ],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
