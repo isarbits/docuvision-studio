@@ -24,7 +24,6 @@ export class Client {
         return superagent
             .post(`${this.baseUri}/v1/document/upload`)
             .attach('file', fs.createReadStream(params.file), basename(params.file))
-            .field('ocrEngine', process.env.NODE_ENV === 'development' ? 'tesseract' : null)
             .set('Authorization', this.authHeader)
             .catch(this.handleApiError);
     }
