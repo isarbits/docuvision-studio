@@ -23,9 +23,8 @@ export class PageHitListItem extends React.Component<{
             }
         };
 
-        const imagePath = `${((source.document.id as EsTypeOf) as string).replace('_', '/')}/${
-            source.page.pageNumber
-        }.jpg`;
+        // FIXME: use backend so logic can be shared
+        const imagePath = `${source.document.id}/${source.page.pageNumber}/pageImage.jpg`;
 
         return (
             <div
@@ -59,8 +58,8 @@ export class PageHitListItem extends React.Component<{
                             </strong>
                             &nbsp;
                             <span>{source?.createdAt}</span>&nbsp;&nbsp;
-                            <span>{source.upload.folder}</span>&nbsp;|&nbsp;
-                            <span>{source.upload.size} B</span>
+                            <span>{source?.upload?.folder}</span>&nbsp;|&nbsp;
+                            <span>{source?.upload?.size} B</span>
                             {source?.document?.pageCount ? (
                                 <>
                                     &nbsp;|&nbsp;

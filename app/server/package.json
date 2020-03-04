@@ -9,7 +9,8 @@
         "preinstall": "node .npm-scripts/preinstall.js",
         "build": "tsc -p tsconfig.build.json",
         "format": "prettier --write -l \"src/**/*.ts\" && eslint --fix src/ --ext .ts",
-        "watch": "tsc-watch --preserveWatchOutput --onSuccess 'npm start'",
+        "watch": "npm run build -- -w",
+        "dev": "tsc-watch --preserveWatchOutput --onSuccess 'npm start'",
         "start": "cd dist && node src/main.js"
     },
     "dependencies": {
@@ -25,7 +26,7 @@
         "reflect-metadata": "^0.1.13",
         "rxjs": "^6.5.4",
         "source-map-support": "^0.5.16",
-        "uuid": "^7.0.1"
+        "uuid": "^7.0.2"
     },
     "devDependencies": {
         "@types/node": "^13.7.6",

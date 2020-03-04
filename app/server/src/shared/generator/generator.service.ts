@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import * as uuid from 'uuid/v1';
 
 @Injectable()

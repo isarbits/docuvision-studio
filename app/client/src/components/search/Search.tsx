@@ -1,13 +1,32 @@
 import React from 'react';
-import { ActionBar, ActionBarRow, DynamicRangeFilter, GroupedSelectedFilters, HitsStats, Layout, LayoutBody, LayoutResults, NoHits, Pagination, RefinementListFilter, ResetFilters, SearchBox, SearchkitManager, SearchkitProvider, SideBar, SortingSelector, TopBar, ViewSwitcherHits, ViewSwitcherToggle } from 'searchkit';
+import {
+    ActionBar,
+    ActionBarRow,
+    DynamicRangeFilter,
+    GroupedSelectedFilters,
+    HitsStats,
+    Layout,
+    LayoutBody,
+    LayoutResults,
+    NoHits,
+    Pagination,
+    RefinementListFilter,
+    ResetFilters,
+    SearchBox,
+    SearchkitManager,
+    SearchkitProvider,
+    SideBar,
+    SortingSelector,
+    TopBar,
+    ViewSwitcherHits,
+    ViewSwitcherToggle,
+} from 'searchkit';
 import { baseUrl, defaultIndex, githubRepo } from '../../config';
 import { PageHitGridItem } from './PageHitGridItem/PageHitGridItem';
 import { PageHitListItem } from './PageHitListItem/PageHitListItem';
 import './search.scss';
 
 export class Search extends React.Component<{}> {
-    public state = {};
-
     private searchkit = new SearchkitManager(`${baseUrl}/search/${defaultIndex}`);
 
     public render() {
@@ -17,8 +36,13 @@ export class Search extends React.Component<{}> {
                     <TopBar>
                         <div className="title">
                             <span>Docuvision Studio</span>
-                            <a href={githubRepo} target="_blank" rel="noopener noreferrer">
-                                <img src="GitHub-Mark-Light-64px.png" />
+                            <a
+                                href={githubRepo}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Docuvision Studio on Github"
+                            >
+                                <img src="GitHub-Mark-Light-64px.png" alt="Docuvision GitHub" />
                             </a>
                         </div>
                         <SearchBox
@@ -61,6 +85,7 @@ export class Search extends React.Component<{}> {
                                 title="Page Count"
                             />
                         </SideBar>
+
                         <LayoutResults>
                             <ActionBar>
                                 <ActionBarRow>
