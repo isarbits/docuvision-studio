@@ -5,7 +5,7 @@ services:
     container_name: ds_elastic
     image: isarbits/es-kibana
     volumes:
-      - esdata:/home/elasticsearch/elasticsearch/data
+      - ./elasticdata:/home/elasticsearch/elasticsearch/data
     ports:
       - "9200:9200" # elastic
       - "5601:5601" # kibana
@@ -15,9 +15,9 @@ services:
     image: isarbits/docuvision-studio-app
     restart: always
     environment:
+      - NODE_ENV=production
       - PORT=8100
       - ELASTICSEARCH_NODE=http://ds_elastic:9200
-      - NODE_ENV=production
     ports:
       - "8100:8100"
     volumes:
@@ -29,6 +29,7 @@ services:
     restart: always
     network_mode: host
     environment:
+      - NODE_ENV=production
       - ELASTICSEARCH_NODE=http://localhost:9200
       - DOCUVISION_HOST=${DOCUVISION_HOST}
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
