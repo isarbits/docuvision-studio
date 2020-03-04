@@ -2,18 +2,18 @@ import { RequestParams } from '@elastic/elasticsearch';
 import { elastic } from 'config';
 import { DocuvisionClient, Params, SearchResponse } from '../interfaces';
 import '../lib/errors';
-import { Search } from '../search/search';
+import { SearchManager } from '../elastic/search/search-manager';
 
-const client = new Search({
-    index: elastic.index || 'docuvision',
+const esClient = SearchManager.getClient({
+    index: elastic.index,
     node: elastic.node,
 });
 
 export const search = async (queryString: string, paging?: Params<RequestParams.Search>): Promise<SearchResponse> => {
-    const { body: exists } = await client.indicesExists();
+    const { body: exists } = await esClient.indicesExists();
     if (!exists) {
-        console.error(`index '${client.defaultIndex}' not found`);
-        console.error(`Either configure to use an existing index, or index files to the '${client.defaultIndex}' index`);
+        console.error(`index '${esClient.defaultIndex}' not found`);
+        console.error(`Either configure to use an existing index, or index files to the '${esClient.defaultIndex}' index`);
         console.error(`Try 'npm run search index --help' for more info`);
         process.exit(0);
     }
@@ -29,8 +29,8 @@ export const search = async (queryString: string, paging?: Params<RequestParams.
         };
     }
 
-    const res = await client.search<{ document?: DocuvisionClient.Document; error: any }>({
-        index: `${client.defaultIndex}_page`,
+    const res = await esClient.search<{ document?: DocuvisionClient.Document; error: any }>({
+        index: `${esClient.defaultIndex}_page`,
         ...query,
     });
 
@@ -41,4 +41,4 @@ export const search = async (queryString: string, paging?: Params<RequestParams.
     return res;
 };
 
-export const dev = { client };
+export const dev = { esClient };

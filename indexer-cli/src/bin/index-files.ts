@@ -1,29 +1,36 @@
-import { docuvision, elastic, paths } from 'config';
-import * as fs from 'fs';
-import * as path from 'path';
-import { Client as DocuClient } from '../docuvision/docuvision';
+import { docuvision, elastic } from 'config';
+import { Client } from '../docuvision/docuvision';
+import { indexDocument } from '../elastic/indices/document';
+import { indexPage } from '../elastic/indices/page';
+import { indexAllWords } from '../elastic/indices/word';
+import { SearchManager } from '../elastic/search/search-manager';
 import { DocuvisionClient } from '../interfaces';
 import '../lib/errors';
 import { hashFile } from '../lib/hash';
 import { Progress, walkPaths } from '../lib/utils';
 import { log, logError } from '../logging/es-log';
-import { Search } from '../search/search';
-import { FileSystemStatic } from '../storage/filesystem';
 
-const index = elastic.index || 'docuvision';
+export type PollResponse = Omit<DocuvisionClient.GetDocumentResponse, 'body'> & {
+    body?: any;
+    failed?: boolean;
+    duration?: number;
+    message?: string;
+    stack?: string;
+    uploadFailure?: any;
+};
 
-const search = new Search({
+const esClient = SearchManager.getClient({
+    index: elastic.index,
     node: elastic.node,
-    index,
 });
 
-const docuvisionClient = new DocuClient({
+const docuvisionClient = new Client({
     host: docuvision.host,
     apiKey: docuvision.apiKey,
 });
 
 const idExists = async (id: string) => {
-    const { body } = await search.count({
+    const { body } = await esClient.count({
         body: {
             query: {
                 term: {
@@ -35,91 +42,52 @@ const idExists = async (id: string) => {
     return 0 !== body.count;
 };
 
-const uploadAndWaitForCompletion = async (file: string): Promise<DocuvisionClient.GetDocumentResponse> => {
-    const upload = await docuvisionClient.upload({ file });
-    return await docuvisionClient.pollForCompletion(upload.body.id, docuvision.pollTimeout);
+const handlePollFailure = (uploadFailure: DocuvisionClient.GetDocumentResponse): PollResponse => {
+    if (uploadFailure?.body) {
+        return { ...uploadFailure, failed: true };
+    } else if (uploadFailure instanceof Error) {
+        return { message: uploadFailure.message, stack: uploadFailure.stack, failed: true };
+    }
+    return { uploadFailure, failed: true };
 };
 
-const indexFile = async (file: string): Promise<DocuvisionClient.GetDocumentResponse & { duration: number; failed?: boolean }> => {
+const uploadAndWaitForCompletion = async (file: string): Promise<PollResponse> => {
+    const upload = await docuvisionClient.upload({ file });
+
+    const start = Date.now();
+
+    const response: PollResponse = await docuvisionClient.pollForCompletion(upload.body.id, docuvision.pollTimeout).catch(handlePollFailure);
+
+    response.duration = Date.now() - start;
+
+    return response;
+};
+
+const indexFile = async (file: string): Promise<PollResponse> => {
     const md5 = await hashFile(file);
     if (await idExists(md5)) {
         return null;
     }
 
-    const start = Date.now();
-    const response: DocuvisionClient.GetDocumentResponse & { failed?: boolean } = await uploadAndWaitForCompletion(file).catch(uploadFailure => {
-        if (uploadFailure?.body) {
-            return { ...uploadFailure, failed: true };
-        } else if (uploadFailure instanceof Error) {
-            return { message: uploadFailure.message, stack: uploadFailure.stack, failed: true };
-        }
-        return { uploadFailure, failed: true };
-    });
-    const duration = Date.now() - start;
-
-    const fullPath = path.resolve(file);
-
-    const document = {
-        id: md5,
-        createdAt: new Date(),
-        error: null,
-        document: null,
-        processingTime: duration,
-        upload: {
-            path: fullPath,
-            folder: path.dirname(fullPath),
-            filename: path.basename(fullPath),
-            extension: path.extname(fullPath),
-            size: fs.statSync(fullPath).size,
-            md5,
-        },
-    };
-
-    if (response.failed) {
-        document.error = response;
-    } else if (response?.body?.errors?.length) {
-        document.error = response.body;
-        response.failed = true;
-    } else {
-        document.document = response.body;
-    }
-
-    await search.index({ body: document });
+    const response = await uploadAndWaitForCompletion(file);
+    const document = await indexDocument(file, response);
 
     if (!response?.failed && document.document) {
-        const { pages, ...doc } = document.document as DocuvisionClient.Document;
-
-        if (pages?.length) {
-            await Promise.all(
-                pages.map(page => {
-                    const body = {
-                        ...document,
-                        id: `${document.id}_${page.pageNumber}`,
-                        document: doc,
-                        page,
-                    };
-
-                    return Promise.all([
-                        docuvisionClient
-                            .getPageImage(page.imgUrl)
-                            .then(({ body }) => {
-                                return FileSystemStatic.putFile(`${paths.generatedFiles}/${doc.id}/${page.pageNumber}.jpg`, body, {
-                                    encoding: 'binary',
-                                });
-                            })
-                            .catch(logError),
-                        search.index({ index: `${index}_page`, body }).catch(logError),
-                    ]);
-                }),
-            );
+        if (document.document?.pages?.length) {
+            const toIndex = [];
+            for (const page of document.document.pages) {
+                toIndex.push(indexPage(document, page));
+                toIndex.push(indexAllWords(document, page));
+            }
+            await Promise.all(toIndex);
         }
     }
 
-    return { ...response, duration };
+    return response;
 };
 
 export const indexAllFiles = async (paths: string[], pingClient = true) => {
-    if (!(await search.client.ping().catch(() => null))) {
+    if (!(await esClient.client.ping().catch(() => null))) {
         console.error(`Elasticsearch is unreachable (${elastic.node})`);
         process.exit(1);
     }
@@ -128,13 +96,17 @@ export const indexAllFiles = async (paths: string[], pingClient = true) => {
         process.exit(1);
     }
 
-    await Promise.all([search.indicesCreate({ index }).catch(() => null), search.indicesCreate({ index: `${index}_page` }).catch(() => null)]);
+    await Promise.all([
+        esClient.indicesCreate({ index: elastic.index }).catch(() => null),
+        esClient.indicesCreate({ index: `${elastic.index}_page` }).catch(() => null),
+        esClient.indicesCreate({ index: `${elastic.index}_word` }).catch(() => null),
+    ]);
 
     const promises: Promise<void>[] = [];
 
     const progress = new Progress();
 
-    console.log(`Started ${new Date().toUTCString()}`);
+    console.log(`\nStarted ${new Date().toUTCString()}`);
 
     for (const file of walkPaths(paths)) {
         progress.total++;
@@ -145,11 +117,14 @@ export const indexAllFiles = async (paths: string[], pingClient = true) => {
         const result = indexFile(file)
             .then(r => {
                 progress.pending--;
+
                 if (r === null) {
                     progress.skippedExisting++;
                     return;
                 }
+
                 progress.time.each[file] = { time: r.duration };
+
                 if (r.failed) {
                     progress.failed++;
                     progress.time.each[file].failed = true;
@@ -177,13 +152,4 @@ export const indexAllFiles = async (paths: string[], pingClient = true) => {
     log(JSON.stringify(progress));
 
     console.log(`\n\nFinished processing in ${(progress.elapsed / 1000).toFixed(2)}s`);
-};
-
-export const dev = {
-    index,
-    search,
-    docuvisionClient,
-    idExists,
-    uploadAndWaitForCompletion,
-    indexFile,
 };

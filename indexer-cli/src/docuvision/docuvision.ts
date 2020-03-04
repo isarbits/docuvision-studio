@@ -24,6 +24,7 @@ export class Client {
         return superagent
             .post(`${this.baseUri}/v1/document/upload`)
             .attach('file', fs.createReadStream(params.file), basename(params.file))
+            .field('ocrEngine', process.env.NODE_ENV === 'development' ? 'tesseract' : null)
             .set('Authorization', this.authHeader)
             .catch(this.handleApiError);
     }
@@ -83,9 +84,10 @@ export class Client {
 
     reachable(): Promise<boolean> {
         return superagent
-            .get(`${this.baseUri}/v1/_ping`)
+            .get(`${this.baseUri}/v1/ping`)
+            .set('Authorization', this.authHeader)
             .then(() => true)
-            .catch(e => e?.status === 404);
+            .catch(e => [404, 401, 403].includes(e?.status));
     }
 
     // this will be removed from the demo app

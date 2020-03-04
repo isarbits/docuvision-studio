@@ -10,6 +10,7 @@ module.exports = {
     elastic: {
         node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
         index: process.env.ELASTICSEARCH_INDEX || 'docuvision',
+        logIndex: process.env.ELASTICSEARCH_LOG_INDEX || 'logs',
     },
     docuvision: {
         host: process.env.DOCUVISION_HOST || 'https://app.docuvision.io/api',

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
+
 import { RequestParams } from '@elastic/elasticsearch';
 import { indexAllFiles } from './bin/index-files';
 import { search } from './bin/search-indexed';
 import { watchFolderAndIndex } from './bin/watch';
 import { Client } from './docuvision/docuvision';
-import { Params } from './interfaces';
+import { Params } from 'interfaces';
 
 let args = process.argv.slice(3);
 

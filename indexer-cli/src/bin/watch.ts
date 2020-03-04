@@ -43,6 +43,7 @@ export const watchFolderAndIndex = (folder: string) => {
                 filename => fs.existsSync(filename) && fs.statSync(filename).isFile(),
             );
             if (pending.length) {
+                // TODO: upload to api
                 await indexAllFiles(pending, pingOnce);
                 pingOnce = false;
             }
@@ -57,7 +58,7 @@ export const watchFolderAndIndex = (folder: string) => {
 
     fsWatcher.on('all', fsChangeHandler);
 
-    console.log(`Started folderwatcher: ${folder}\n`);
+    console.log(`Started folderwatcher: ${folder}`);
 
     // also launch once on start
     fsWatcher.emit('all', 'change', '/');

@@ -1,13 +1,15 @@
-import { Search } from '../search/search';
+import { Search } from '../elastic/search/search';
 import { elastic } from 'config';
 
 const logger = new Search({
     node: elastic.node,
-    index: 'indexer_logs',
+    index: elastic.logIndex,
 });
 
 const logToElastic = (level: string, data: string) => {
-    return logger.index({ body: { level, data } }).catch(console.error);
+    const body = { level, data, created: Date.now() };
+    if (level === 'error') console.log(body);
+    return logger.index({ body }).catch(console.error);
 };
 
 export const log = (data: string) => logToElastic('default', data);

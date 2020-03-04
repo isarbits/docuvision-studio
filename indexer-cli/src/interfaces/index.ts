@@ -1,2 +1,2 @@
-export * from '../search/search.d';
-export * from '../docuvision/docuvision.d';
+export * from '../elastic/search/';
+export * from '../docuvision/';

@@ -1,10 +1,10 @@
 import { Client, RequestParams } from '@elastic/elasticsearch';
-import { Params, SearchConfig } from './search.d';
-import { SearchResponse } from '../interfaces';
+import { Params, SearchConfig, SearchResponse } from './search.d';
 
 export class Search<TModel = any> {
     public defaultIndex: string;
     public client: Client;
+    public writeQueue: Promise<any>[] = [];
 
     constructor(config: SearchConfig) {
         const { index, ...clientConfig } = config;
@@ -16,8 +16,14 @@ export class Search<TModel = any> {
         return this.client.count({ index: this.defaultIndex, ...params });
     }
 
+    public bulk<T = TModel>(params: Params<RequestParams.Bulk>): Promise<SearchResponse<T>> {
+        const req = this.client.bulk.bind(this.client, { index: this.defaultIndex, ...params });
+        return this.bufferedWrite(req);
+    }
+
     public create<T = TModel>(params: Params<RequestParams.Create>): Promise<SearchResponse<T>> {
-        return this.client.create({ index: this.defaultIndex, ...params });
+        const req = this.client.create.bind(this.client, { index: this.defaultIndex, ...params });
+        return this.bufferedWrite(req);
     }
 
     public delete(params: Params<RequestParams.Delete>): Promise<SearchResponse> {
@@ -41,7 +47,8 @@ export class Search<TModel = any> {
     }
 
     public index<T = TModel>(params: Params<RequestParams.Index>): Promise<SearchResponse<T>> {
-        return this.client.index({ index: this.defaultIndex, ...params });
+        const req = this.client.index.bind(this.client, { index: this.defaultIndex, ...params });
+        return this.bufferedWrite(req);
     }
 
     public search<T = TModel>(params?: Params<RequestParams.Search>): Promise<SearchResponse<T>> {
@@ -114,5 +121,14 @@ export class Search<TModel = any> {
 
     public indicesUpdateAliases<T = TModel>(params: Params<RequestParams.IndicesUpdateAliases>): Promise<SearchResponse<T>> {
         return this.client.indices.updateAliases({ index: this.defaultIndex, ...params });
+    }
+
+    private async bufferedWrite<T = any>(req: () => Promise<T>): Promise<T> {
+        if (this.writeQueue.length >= 50) {
+            await Promise.all(this.writeQueue.splice(0, 100));
+        }
+        const launched = req();
+        this.writeQueue.push(launched);
+        return launched;
     }
 }
