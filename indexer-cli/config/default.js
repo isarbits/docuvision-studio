@@ -11,6 +11,7 @@ module.exports = {
         node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
         index: process.env.ELASTICSEARCH_INDEX || 'docuvision',
         logIndex: process.env.ELASTICSEARCH_LOG_INDEX || 'logs',
+        indexWords: process.env.ELASTICSEARCH_INDEX_WORDS === 'true',
     },
     docuvision: {
         host: process.env.DOCUVISION_HOST || 'https://app.docuvision.io/api',

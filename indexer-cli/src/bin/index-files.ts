@@ -77,7 +77,9 @@ const indexFile = async (file: string): Promise<PollResponse> => {
             const toIndex = [];
             for (const page of document.document.pages) {
                 toIndex.push(indexPage(document, page));
-                toIndex.push(indexAllWords(document, page));
+                if (elastic.indexWords) {
+                    toIndex.push(indexAllWords(document, page));
+                }
             }
             await Promise.all(toIndex);
         }
