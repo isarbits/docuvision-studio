@@ -2,7 +2,7 @@ import { docuvision } from 'config';
 import * as fs from 'fs';
 import { basename } from 'path';
 import * as superagent from 'superagent';
-import { DocuvisionClient } from './docuvision.d';
+import { Docuvision } from './docuvision.d';
 import { URL } from 'url';
 
 /**
@@ -14,13 +14,13 @@ export class Client {
     private baseUri: string;
     private authHeader: string;
 
-    constructor(config?: DocuvisionClient.ClientConfig) {
+    constructor(config?: Docuvision.ClientConfig) {
         this.baseUri = config?.host || docuvision.host;
         this.authHeader = `ApiKey ${config?.apiKey || docuvision.apiKey}`;
         void this.createKey;
     }
 
-    upload(params: DocuvisionClient.UploadRequest): Promise<DocuvisionClient.UploadResponse> {
+    upload(params: Docuvision.UploadRequest): Promise<Docuvision.UploadResponse> {
         return superagent
             .post(`${this.baseUri}/v1/document/upload`)
             .attach('file', fs.createReadStream(params.file), basename(params.file))
@@ -28,7 +28,7 @@ export class Client {
             .catch(this.handleApiError);
     }
 
-    getDocument(params: DocuvisionClient.GetDocumentRequest): Promise<DocuvisionClient.GetDocumentResponse> {
+    getDocument(params: Docuvision.GetDocumentRequest): Promise<Docuvision.GetDocumentResponse> {
         const { fromPage, toPage } = params;
 
         return superagent
@@ -37,21 +37,21 @@ export class Client {
             .catch(this.handleApiError);
     }
 
-    listDocuments(params?: DocuvisionClient.ListDocumentsRequest): Promise<DocuvisionClient.ListDocumentsResponse> {
+    listDocuments(params?: Docuvision.ListDocumentsRequest): Promise<Docuvision.ListDocumentsResponse> {
         return superagent
             .get(`${this.baseUri}/v1/document${this.serialize(params)}`)
             .set('Authorization', this.authHeader)
             .catch(this.handleApiError);
     }
 
-    deleteDocument(params?: DocuvisionClient.DeleteDocumentRequest): Promise<DocuvisionClient.DeleteDocumentResponse> {
+    deleteDocument(params?: Docuvision.DeleteDocumentRequest): Promise<Docuvision.DeleteDocumentResponse> {
         return superagent
             .delete(`${this.baseUri}/v1/document/${params.docId}`)
             .set('Authorization', this.authHeader)
             .catch(this.handleApiError);
     }
 
-    getPageImage(params?: string | DocuvisionClient.GetDocumentPageImageRequest): Promise<DocuvisionClient.GetDocumentPageImageResponse> {
+    getPageImage(params?: string | Docuvision.GetDocumentPageImageRequest): Promise<Docuvision.GetDocumentPageImageResponse> {
         const fullImageUri = typeof params === 'string' ? params : `${this.baseUri}/v1/document/${params.documentId}/${params.pageNum}.jpg`;
 
         return superagent
@@ -62,7 +62,7 @@ export class Client {
 
     async pollForCompletion(docId: string, maxWaitSeconds = 0) {
         let waitedSeconds = 0;
-        let response: DocuvisionClient.GetDocumentResponse;
+        let response: Docuvision.GetDocumentResponse;
 
         while (!maxWaitSeconds || waitedSeconds++ < maxWaitSeconds) {
             response = await this.getDocument({ id: docId });

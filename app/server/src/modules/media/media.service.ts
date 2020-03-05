@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { paths } from 'config';
+
 import { LoggingService } from '../../shared/logging/logging.service';
 
 @Injectable()

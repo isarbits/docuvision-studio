@@ -1,6 +1,7 @@
 import { CallHandler, ExecutionContext, HttpException, Injectable, NestInterceptor, ServiceUnavailableException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+
 import { LoggingService } from '../../shared/logging/logging.service';
 
 const log = new LoggingService('ErrorsInterceptor');

@@ -4,6 +4,8 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
     app: 'search',
+    host: process.env.HOST || 'http://localhost:8100/v1',
+    apiKey: process.env.DOCUVISION_APIKEY,
     paths: {
         generatedFiles: process.env.PATHS_GENERATED_FILES || '/generated-files',
     },
@@ -15,7 +17,6 @@ module.exports = {
     },
     docuvision: {
         host: process.env.DOCUVISION_HOST || 'https://app.docuvision.io/api',
-        apiKey: process.env.DOCUVISION_APIKEY,
         pollTimeout: process.env.DOCUVISION_POLL_TIMEOUT,
     },
 };

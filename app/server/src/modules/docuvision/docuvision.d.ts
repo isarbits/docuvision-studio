@@ -1,7 +1,10 @@
-import superagent from 'superagent';
+import { AxiosResponse } from 'axios';
+import { Observable } from 'rxjs';
 
-export module Docuvision {
-    export interface ApiResponse<T = any> extends superagent.Response {
+import { File } from '../../interfaces/file';
+
+export namespace Docuvision {
+    export interface ApiResponse<T = any> extends Observable<AxiosResponse<T>> {
         body: T;
     }
 
@@ -44,7 +47,7 @@ export module Docuvision {
     }
 
     export interface UploadRequest {
-        file: string;
+        file: File;
         ocrEngine?: 'tesseract' | 'google';
     }
 
@@ -85,5 +88,5 @@ export module Docuvision {
         pageNum: number;
     }
 
-    export type GetDocumentPageImageResponse = ApiResponse<Buffer>;
+    export type GetDocumentPageImageResponse = Buffer;
 }

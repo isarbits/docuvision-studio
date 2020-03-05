@@ -19,6 +19,7 @@ services:
     environment:
       - PORT=8100
       - ELASTICSEARCH_NODE=http://ds_elastic:9200
+      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       - NODE_ENV=development
     ports:
       - "8100:8100"

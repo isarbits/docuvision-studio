@@ -1,15 +1,11 @@
-import { elastic } from 'config';
-import { DocuvisionClient } from 'interfaces';
+import { Docuvision } from 'interfaces';
 import { logError } from '../../logging/es-log';
-import { SearchManager } from '../search/search-manager';
 import { IndexDocument, IndexWord } from '../index.d';
+import { StudioClient } from '../../api/client';
 
-const esClient = SearchManager.getClient({
-    node: elastic.node,
-    index: `${elastic.index}_word`,
-});
+const studioClient = new StudioClient();
 
-const getIndexableWord = (indexDocument: IndexDocument, page: DocuvisionClient.Page, word: DocuvisionClient.Word, wordIndex: number): IndexWord => {
+const getIndexableWord = (indexDocument: IndexDocument, page: Docuvision.Page, word: Docuvision.Word, wordIndex: number): IndexWord => {
     const { pages, ...document } = indexDocument.document;
     const { words, ...rest } = page;
     void [pages, words];
@@ -30,13 +26,12 @@ const getIndexableWord = (indexDocument: IndexDocument, page: DocuvisionClient.P
     };
 };
 
-export const indexWord = (indexDocument: IndexDocument, page: DocuvisionClient.Page, word: DocuvisionClient.Word, wordIndex: number) => {
+export const indexWord = (indexDocument: IndexDocument, page: Docuvision.Page, word: Docuvision.Word, wordIndex: number) => {
     const body = getIndexableWord(indexDocument, page, word, wordIndex);
-    return esClient.index({ body }).catch(logError);
+    return studioClient.indexWord(body).catch(logError);
 };
 
-export const indexAllWords = (indexDocument: IndexDocument, page: DocuvisionClient.Page) => {
+export const indexAllWords = (indexDocument: IndexDocument, page: Docuvision.Page) => {
     const words = page.words.map((word, index) => getIndexableWord(indexDocument, page, word, index));
-    const body = words.flatMap(word => [{ index: { _index: esClient.defaultIndex, _type: '_doc' } }, word]);
-    return esClient.bulk({ body }).catch(logError);
+    return studioClient.indexWords(words).catch(logError);
 };

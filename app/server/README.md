@@ -17,12 +17,12 @@
 </p>
 
 <p align="center">
-<a href="https://img.shields.io/github/license/p-mcgowan/nestjs-boilerplate?style=flat-square" target="_blank"><img src="https://img.shields.io/github/license/p-mcgowan/nestjs-boilerplate?style=flat-square" alt="License"/></a>
-<a href="https://img.shields.io/snyk/vulnerabilities/github/p-mcgowan/nestjs-boilerplate?style=flat-square" target="_blank"><img src="https://img.shields.io/snyk/vulnerabilities/github/p-mcgowan/nestjs-boilerplate?style=flat-square" alt="Snyk"/></a>
-<a href="https://img.shields.io/github/languages/code-size/p-mcgowan/nestjs-boilerplate?style=flat-square" target="_blank"><img src="https://img.shields.io/github/languages/code-size/p-mcgowan/nestjs-boilerplate?style=flat-square" alt="Code Size"/></a>
-<a href="https://img.shields.io/github/package-json/v/p-mcgowan/nestjs-boilerplate?style=flat-square" target="_blank"><img src="https://img.shields.io/github/package-json/v/p-mcgowan/nestjs-boilerplate?style=flat-square" alt="Version"/></a>
-<a href="https://img.shields.io/github/languages/top/p-mcgowan/nestjs-boilerplate?style=flat-square" target="_blank"><img src="https://img.shields.io/github/languages/top/p-mcgowan/nestjs-boilerplate?style=flat-square" alt="Top Language"/></a>
-<!-- <a href="https://img.shields.io/codacy/grade/uuid?style=flat-square" target="_blank"><img src="https://img.shields.io/codacy/grade/uuid?style=flat-square" alt="Codacity Code Quality"/></a> -->
+    <a href="https://img.shields.io/github/license/isarbits/docuvision-studio?style=flat-square" target="_blank"><img src="https://img.shields.io/github/license/isarbits/docuvision-studio?style=flat-square" alt="License"/></a>
+    <a href="https://img.shields.io/snyk/vulnerabilities/github/isarbits/docuvision-studio?style=flat-square" target="_blank"><img src="https://img.shields.io/snyk/vulnerabilities/github/isarbits/docuvision-studio?style=flat-square" alt="Snyk"/></a>
+    <a href="https://img.shields.io/github/languages/code-size/isarbits/docuvision-studio?style=flat-square" target="_blank"><img src="https://img.shields.io/github/languages/code-size/isarbits/docuvision-studio?style=flat-square" alt="Code Size"/></a>
+    <a href="https://img.shields.io/github/package-json/v/isarbits/docuvision-studio?style=flat-square" target="_blank"><img src="https://img.shields.io/github/package-json/v/isarbits/docuvision-studio?style=flat-square" alt="Version"/></a>
+    <a href="https://img.shields.io/github/languages/top/isarbits/docuvision-studio?style=flat-square" target="_blank"><img src="https://img.shields.io/github/languages/top/isarbits/docuvision-studio?style=flat-square" alt="Top Language"/></a>
+    <!-- <a href="https://img.shields.io/codacy/grade/uuid?style=flat-square" target="_blank"><img src="https://img.shields.io/codacy/grade/uuid?style=flat-square" alt="Codacity Code Quality"/></a> -->
 </p>
 
 ## Description

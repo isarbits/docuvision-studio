@@ -1,4 +1,4 @@
-import { DocuvisionClient } from 'interfaces';
+import { Docuvision } from 'interfaces';
 export * from './search';
 
 export interface Tree {
@@ -23,18 +23,18 @@ export interface IndexObject {
 }
 
 export interface IndexDocument extends IndexObject {
-    document: DocuvisionClient.Document;
+    document: Docuvision.Document;
 }
 
 export interface IndexPage extends IndexObject {
-    document: Omit<DocuvisionClient.Document, 'pages'>;
-    page: DocuvisionClient.Page;
+    document: Omit<Docuvision.Document, 'pages'>;
+    page: Docuvision.Page;
 }
 
 export interface IndexWord extends IndexObject {
-    document: Omit<DocuvisionClient.Document, 'pages'>;
-    page: Omit<DocuvisionClient.Page, 'words'>;
-    word: DocuvisionClient.Word & {
+    document: Omit<Docuvision.Document, 'pages'>;
+    page: Omit<Docuvision.Page, 'words'>;
+    word: Docuvision.Word & {
         index: number;
         x0: number;
         y0: number;

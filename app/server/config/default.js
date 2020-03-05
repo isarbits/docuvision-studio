@@ -20,5 +20,10 @@ module.exports = {
     },
     elasticsearch: {
         node: process.env.ELASTICSEARCH_NODE ?? 'http://localhost:9200',
-    }
+    },
+    docuvision: {
+        host: process.env.DOCUVISION_HOST || 'https://app.docuvision.io/api',
+        apiKey: process.env.DOCUVISION_APIKEY,
+        pollTimeout: process.env.DOCUVISION_POLL_TIMEOUT,
+    },
 };

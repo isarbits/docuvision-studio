@@ -1,11 +1,24 @@
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { INQUIRER } from '@nestjs/core';
-import { Injectable, Scope, Inject } from '@nestjs/common';
 import { envName, logging } from 'config';
+
 import { LoggingModel } from './logging.model';
 
 interface LogLevels {
     [source: string]: string;
 }
+
+const colourize = (source: string) => {
+    const col =
+        {
+            SERVER: '\x1b[32m',
+            INFO: '\x1b[34m',
+            DEBUG: '\x1b[30;1m',
+            WARN: '\x1b[33m',
+            VERBOSE: '\x1b[35m',
+        }[source] || '';
+    return `${col}${source}\x1b[0;0m`;
+};
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggingService {
@@ -83,10 +96,10 @@ export class LoggingService {
 
         msg = typeof msg === 'string' ? msg : JSON.stringify(msg, null, pretty);
 
-        const colourize = s => `\x1b[1;36m${s}\x1b[0;0m`;
+        const sourceCol = s => `\x1b[1;36m${s}\x1b[0;0m`;
 
         if (source) {
-            logType(`${humanFormat} ${timestamp} [${colourize(source)}]`, type.toUpperCase(), msg);
+            logType(`${humanFormat} ${timestamp} [${sourceCol(source)}]`, colourize(type.toUpperCase()), msg);
         } else {
             logType(timestamp, colourize(type.toUpperCase()), msg);
         }

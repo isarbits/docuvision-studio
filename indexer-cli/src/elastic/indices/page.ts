@@ -1,30 +1,23 @@
-import { docuvision, elastic, paths } from 'config';
-import { DocuvisionClient } from 'interfaces';
-import { Client } from '../../docuvision/docuvision';
+// import { paths } from 'config';
+import { Docuvision } from 'interfaces';
+// import { join } from 'path';
+import { StudioClient } from '../../api/client';
 import { logError } from '../../logging/es-log';
-import { SearchManager } from '../search/search-manager';
-import { FileSystemStatic } from '../../storage/filesystem';
+// import { FileSystemStatic } from '../../storage/filesystem';
 import { IndexDocument, IndexPage } from '../index.d';
-import { join } from 'path';
 
-const docuvisionClient = new Client({
-    host: docuvision.host,
-    apiKey: docuvision.apiKey,
-});
+const studioClient = new StudioClient();
 
-const esClient = SearchManager.getClient({
-    node: elastic.node,
-    index: `${elastic.index}_page`,
-});
-
-const getPageImage = (page: DocuvisionClient.Page, docId: string) => {
-    return docuvisionClient.getPageImage(page.imgUrl).then(({ body }) => {
-        const path = join(paths.generatedFiles, docId, `${page.pageNumber}`, 'pageImage.jpg');
-        return FileSystemStatic.putFile(path, body, { encoding: 'binary' });
-    });
+const getPageImage = (page: Docuvision.Page, docId: string) => {
+    return studioClient.download(docId, page.pageNumber, 'image')/*.then(
+        ({ body }) => {
+            const path = join(paths.generatedFiles, docId, `${page.pageNumber}`, 'pageImage.jpg');
+            return FileSystemStatic.putFile(path, body, { encoding: 'binary' });
+        }
+    );*/
 };
 
-export const indexPage = (indexDocument: IndexDocument, page: DocuvisionClient.Page): Promise<any[]> => {
+export const indexPage = (indexDocument: IndexDocument, page: Docuvision.Page): Promise<any[]> => {
     const { pages, ...document } = indexDocument.document;
     void [pages];
 
@@ -35,5 +28,5 @@ export const indexPage = (indexDocument: IndexDocument, page: DocuvisionClient.P
         page,
     };
 
-    return Promise.all([getPageImage(page, indexDocument.document.id).catch(logError), esClient.index({ body }).catch(logError)]);
+    return Promise.all([getPageImage(page, indexDocument.document.id).catch(logError), studioClient.indexPage(body).catch(logError)]);
 };

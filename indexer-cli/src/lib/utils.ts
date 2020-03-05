@@ -89,7 +89,7 @@ export class Progress {
 
         if (this._first && !errors) {
             // Move curser up lines.length - 1 times
-            process.stdout.write(`\x1b[A`.repeat(lines.length - 1));
+            // process.stdout.write(`\x1b[A`.repeat(lines.length - 1));
         }
         this._first = true;
 
@@ -98,6 +98,7 @@ export class Progress {
                 console.log(e);
             }
         }
+        return;
 
         // Print out lines (\x1b[K\r will clear current line)
         process.stdout.write(lines.join('\n'));

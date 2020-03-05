@@ -13,7 +13,7 @@
         "index": "node dist/src/index.js index",
         "apikey": "node dist/src/index.js apikey",
         "docker": "cd docker/dev && docker-compose up -d --remove-orphans --build",
-        "format": "eslint --fix src/ --ext .ts && prettier --write -l \"src/**/*.ts\"",
+        "format": "prettier --write -l \"src/**/*.ts\" && eslint --fix src/ --ext .ts",
         "preinstall": "node .npm-scripts/preinstall.js"
     },
     "dependencies": {

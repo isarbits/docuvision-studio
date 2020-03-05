@@ -3,6 +3,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import * as config from 'config';
+
 import { AppModule } from './app.module';
 import { BadRequestExceptionFilter } from './common/filters/bad-request.filter';
 import { ErrorsInterceptor } from './common/interceptors/errors.interceptor';
