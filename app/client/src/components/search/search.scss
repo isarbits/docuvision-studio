@@ -1,4 +1,8 @@
 #root {
+    .app-content {
+        position: relative;
+    }
+
     .sk-layout {
         .title {
             display: flex;
@@ -16,6 +20,13 @@
 
         .sk-layout__top-bar {
             background: #104200;
+            position: inherit;
+            padding: 0.5rem 0;
+
+            .sk-top-bar__content {
+                padding: 0 1rem;
+                margin: 0 2rem;
+            }
         }
 
         .sk-hits-list {

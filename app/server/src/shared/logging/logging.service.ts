@@ -1,6 +1,6 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { INQUIRER } from '@nestjs/core';
-import { envName, logging } from 'config';
+import { logging } from 'config';
 
 import { LoggingModel } from './logging.model';
 
@@ -20,9 +20,11 @@ const colourize = (source: string) => {
     return `${col}${source}\x1b[0;0m`;
 };
 
+type Loggable = string | object | number | Error;
+
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggingService {
-    public logLevels: LogLevels;
+    logLevels: LogLevels;
     private originalLogLevels: LogLevels;
     private source: string;
 
@@ -31,27 +33,27 @@ export class LoggingService {
         this.parseLogLevel(logging.logLevel || 'default:all');
     }
 
-    public server(msg: string | object) {
-        this.sendLog('server', this.source, msg);
+    server(...msg: Loggable[]) {
+        this.sendLog('server', this.source, null, ...msg);
     }
 
-    public info(msg: string | object) {
-        this.sendLog('info', this.source, msg);
+    info(...msg: Loggable[]) {
+        this.sendLog('info', this.source, null, ...msg);
     }
 
-    public debug(msg: string | object) {
-        this.sendLog('debug', this.source, msg);
+    debug(...msg: Loggable[]) {
+        this.sendLog('debug', this.source, null, ...msg);
     }
 
-    public warn(msg: string | object) {
-        this.sendLog('warn', this.source, msg);
+    warn(...msg: Loggable[]) {
+        this.sendLog('warn', this.source, null, ...msg);
     }
 
-    public verbose(msg: string | object) {
-        this.sendLog('verbose', this.source, msg);
+    verbose(...msg: Loggable[]) {
+        this.sendLog('verbose', this.source, null, ...msg);
     }
 
-    public error(msg: string | object | Error, err?: Error, options?: Partial<LoggingModel>) {
+    error(msg: Loggable, err?: Error, options?: Partial<LoggingModel>) {
         let output: any = msg;
         if (msg instanceof Error) {
             output = this.formatError(msg);
@@ -61,19 +63,19 @@ export class LoggingService {
                 error: this.formatError(err),
             };
         }
-        this.sendLog('error', this.source, output, options);
+        this.sendLog('error', this.source, options, output);
         // TODO: log errors, etc to elastic
     }
 
-    public setLogLevel(source: string, level: string) {
+    setLogLevel(source: string, level: string) {
         this.logLevels[source] = level;
     }
 
-    public resetLogLevel() {
+    resetLogLevel() {
         this.logLevels = { ...this.originalLogLevels };
     }
 
-    public parseLogLevel(levels: string) {
+    parseLogLevel(levels: string) {
         const delimiter = ';';
         this.logLevels = {
             default: 'all',
@@ -85,31 +87,33 @@ export class LoggingService {
         this.originalLogLevels = { ...this.logLevels };
     }
 
-    private sendLog(type: string, source: string | null, msg: string | object, _options?: string | Partial<LoggingModel>): boolean {
+    private sendLog(type: string, source: string | null, _options?: string | Partial<LoggingModel>, ...msg: Loggable[]): boolean {
         if (!this.shouldLog(source, type)) {
             return false;
         }
 
-        const { humanFormat, timestamp } = this.formatDate();
+        // const { humanFormat, timestamp } = this.formatDate();
+        const { timestamp } = this.formatDate();
         const logType = console[type] || console.log;
-        const pretty = process.env.PRETTY_LOG ? 2 : null;
-
-        msg = typeof msg === 'string' ? msg : JSON.stringify(msg, null, pretty);
 
         const sourceCol = s => `\x1b[1;36m${s}\x1b[0;0m`;
 
         if (source) {
-            logType(`${humanFormat} ${timestamp} [${sourceCol(source)}]`, colourize(type.toUpperCase()), msg);
+            // logType(`${humanFormat} ${timestamp} [${sourceCol(source)}]`, colourize(type.toUpperCase()), ...msg);
+            logType(`${timestamp} [${sourceCol(source)}]`, colourize(type.toUpperCase()), ...msg);
         } else {
-            logType(timestamp, colourize(type.toUpperCase()), msg);
+            logType(timestamp, colourize(type.toUpperCase()), ...msg);
         }
 
+        // map to strings and log elastic
+        // const pretty = process.env.PRETTY_LOG ? 2 : null;
+        // msg = typeof msg === 'string' ? msg : JSON.stringify(msg, null, pretty);
         return true;
     }
 
     private shouldLog(source = 'default', type: string) {
         // always console log if not on dev or test
-        if (!['default', 'test'].includes(envName)) {
+        if (!['development', 'test'].includes(process.env.NODE_ENV)) {
             return true;
         }
         const scope = (source || 'default').toLowerCase();

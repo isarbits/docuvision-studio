@@ -3,23 +3,23 @@ import { Observable } from 'rxjs';
 
 import { File } from '../../interfaces/file';
 
-export namespace Docuvision {
-    export interface ApiResponse<T = any> extends Observable<AxiosResponse<T>> {
+declare namespace Docuvision {
+    interface ApiResponse<T = any> extends Observable<AxiosResponse<T>> {
         body: T;
     }
 
-    export interface ClientConfig {
+    interface ClientConfig {
         host?: string;
         apiKey?: string;
     }
 
-    export interface Word {
+    interface Word {
         text: string;
         bb: [number, number, number, number];
         angle: number;
     }
 
-    export interface Page {
+    interface Page {
         pageNumber: number;
         status: string;
         errors: string;
@@ -30,7 +30,7 @@ export namespace Docuvision {
         imgUrl: string;
     }
 
-    export interface Document {
+    interface Document {
         id: string;
         url: string;
         status: string;
@@ -46,47 +46,49 @@ export namespace Docuvision {
         toPage: number;
     }
 
-    export interface UploadRequest {
+    interface UploadRequest {
         file: File;
         ocrEngine?: 'tesseract' | 'google';
     }
 
-    export type UploadResponse = ApiResponse<{
+    type UploadResponse = ApiResponse<{
         id: string;
         status: string;
         url: string;
     }>;
 
-    export interface GetDocumentRequest {
+    interface GetDocumentRequest {
         id: string;
         fromPage?: number;
         toPage?: number;
     }
 
-    export type GetDocumentResponse = ApiResponse<Document>;
+    type GetDocumentResponse = ApiResponse<Document>;
 
-    export interface ListDocumentsRequest {
+    interface ListDocumentsRequest {
         offset?: number;
         limit?: number;
     }
 
-    export type ListDocumentsResponse = ApiResponse<{
+    type ListDocumentsResponse = ApiResponse<{
         offset: number;
         limit: number;
         total: number;
         data: Document[];
     }>;
 
-    export interface DeleteDocumentRequest {
+    interface DeleteDocumentRequest {
         docId: string;
     }
 
-    export type DeleteDocumentResponse = ApiResponse<boolean>;
+    type DeleteDocumentResponse = ApiResponse<boolean>;
 
-    export interface GetDocumentPageImageRequest {
+    interface GetDocumentPageImageRequest {
         documentId: string;
         pageNum: number;
     }
 
-    export type GetDocumentPageImageResponse = Buffer;
+    type GetDocumentPageImageResponse = Buffer;
 }
+
+export = Docuvision;

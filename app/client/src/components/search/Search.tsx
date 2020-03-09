@@ -21,7 +21,7 @@ import {
     ViewSwitcherHits,
     ViewSwitcherToggle,
 } from 'searchkit';
-import { baseUrl, defaultIndex, githubRepo } from '../../config';
+import { baseUrl, defaultIndex } from '../../config';
 import { PageHitGridItem } from './PageHitGridItem/PageHitGridItem';
 import { PageHitListItem } from './PageHitListItem/PageHitListItem';
 import './search.scss';
@@ -34,17 +34,6 @@ export class Search extends React.Component<{}> {
             <SearchkitProvider searchkit={this.searchkit}>
                 <Layout>
                     <TopBar>
-                        <div className="title">
-                            <span>Docuvision Studio</span>
-                            <a
-                                href={githubRepo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title="Docuvision Studio on Github"
-                            >
-                                <img src="GitHub-Mark-Light-64px.png" alt="Docuvision GitHub" />
-                            </a>
-                        </div>
                         <SearchBox
                             autofocus={true}
                             searchOnChange={true}

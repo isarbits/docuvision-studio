@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { StorageInterface } from './storage.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { StorageInterface } from './storage.interface';
+
 @Injectable()
 export class FileSystemService implements StorageInterface {
-    public getFile(filename: string) {
-        return fs.promises.readFile(filename);
+    getFile(filename: string, options?: any) {
+        return fs.promises.readFile(filename, options);
     }
 
-    public putFile(filename: string, body: Buffer, options?: any) {
+    putFile(filename: string, body: Buffer | fs.ReadStream, options?: any) {
         fs.mkdirSync(path.dirname(filename), { recursive: true });
 
         return fs.promises
@@ -21,11 +22,11 @@ export class FileSystemService implements StorageInterface {
             });
     }
 
-    public listFiles(path: string) {
+    listFiles(path: string) {
         return fs.promises.readdir(path);
     }
 
-    public getFileInfo(path: string) {
+    getFileInfo(path: string) {
         return fs.promises.stat(path);
     }
 }

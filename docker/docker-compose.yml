@@ -39,5 +39,11 @@ services:
       - "${INPUT_DIR}:/data"
       - "${GENERATED_DIR}:/generated-files"
 
+  redis:
+    container_name: ds_redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
 volumes:
   esdata:

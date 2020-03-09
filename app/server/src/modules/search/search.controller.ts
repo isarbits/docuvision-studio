@@ -8,11 +8,12 @@ import { SearchService } from './search.service';
 type Params<T> = Exclude<T, 'index'>;
 
 @Controller('search')
-@UseInterceptors(new ObservableDataInterceptor('body'), new LogRequestInterceptor('SearchController'))
+@UseInterceptors(new ObservableDataInterceptor('body'))
 export class SearchController {
     constructor(private readonly searchService: SearchService) {}
 
     @Post(':index/_search')
+    @UseInterceptors(new LogRequestInterceptor('SearchController'))
     @HttpCode(HttpStatus.OK)
     async search(@Param('index') index: string, @Body() body: Params<RequestParams.Search>): Promise<any> {
         return this.searchService.search({ index, body });

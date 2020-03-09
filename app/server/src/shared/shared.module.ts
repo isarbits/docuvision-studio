@@ -3,8 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 
 import { GeneratorService } from './generator/generator.service';
 import { LoggingModule } from './logging/logging.module';
-import { ValidatorService } from './validator/validator.service';
 import { FileSystemService } from './storage/filesystem.service';
+import { ValidatorService } from './validator/validator.service';
 
 const providers = [ValidatorService, GeneratorService, FileSystemService];
 

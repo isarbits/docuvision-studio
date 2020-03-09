@@ -19,7 +19,6 @@ export const watchFolderAndIndex = (folder: string) => {
 
     const fileQueue = [];
     let working = false;
-    let pingOnce = true;
     let debounceTimer;
 
     const getDebounced = () =>
@@ -43,9 +42,7 @@ export const watchFolderAndIndex = (folder: string) => {
                 filename => fs.existsSync(filename) && fs.statSync(filename).isFile(),
             );
             if (pending.length) {
-                // TODO: upload to api
-                await indexAllFiles(pending, pingOnce);
-                pingOnce = false;
+                await indexAllFiles(pending);
             }
             working = false;
 

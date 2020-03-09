@@ -1,0 +1,43 @@
+#root {
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
+        Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+
+    .app-header {
+        background: #104200;
+        height: 60px;
+        box-sizing: border-box;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+
+        .header-content {
+            display: flex;
+            color: #fff;
+            flex: 0 0 250px;
+            align-items: center;
+            justify-content: space-between;
+            margin-right: 1rem;
+
+            a,
+            a img {
+                text-align: end;
+                height: 90%;
+            }
+        }
+
+        .links {
+            display: flex;
+            align-items: center;
+
+            nav a {
+                color: white;
+                margin-right: 1rem;
+                text-decoration: none;
+
+                &.active {
+                    border-bottom: 1px solid;
+                }
+            }
+        }
+    }
+}

@@ -7,7 +7,7 @@ import { catchError, flatMap } from 'rxjs/operators';
 import { Readable } from 'stream';
 
 import { File } from '../../interfaces';
-import { Docuvision } from './docuvision.d';
+import Docuvision from './docuvision.d';
 
 type HttpRes<T> = Observable<AxiosResponse<T>>;
 
@@ -19,7 +19,7 @@ export class DocuvisionService {
         this.authHeader = `ApiKey ${docuvision.apiKey}`;
     }
 
-    public upload(file: File, params?: { ocrEngine?: 'tesseract'; waitForCompletion?: boolean }): HttpRes<Docuvision.Document> {
+    upload(file: File, params?: { ocrEngine?: 'tesseract' }): HttpRes<Docuvision.Document> {
         const uri = `${docuvision.host}/v1/document/upload`;
 
         const readable = new Readable();
@@ -28,55 +28,52 @@ export class DocuvisionService {
 
         const formData = new FormData();
         formData.append('file', readable, file.originalname);
+        // TODO: remove
+        formData.append('ocrEngine', 'tesseract');
         if (params.ocrEngine) {
             formData.append('ocrEngine', params.ocrEngine);
         }
 
-        const res = this.httpService.post<Docuvision.Document>(uri, formData, {
+        return this.httpService.post<Docuvision.Document>(uri, formData, {
             headers: {
                 ...formData.getHeaders(),
                 Authorization: this.authHeader,
             },
         });
-
-        if (params.waitForCompletion) {
-            return res.pipe(flatMap(response => this.pollForCompletion(response.data.id)));
-        } else {
-            return res;
-        }
     }
 
-    public getDocument(params: Docuvision.GetDocumentRequest): HttpRes<Docuvision.Document> {
+    getDocument(params: Docuvision.GetDocumentRequest): HttpRes<Docuvision.Document> {
         const { fromPage, toPage } = params;
         const uri = `${docuvision.host}/v1/document/${params.id}${this.serialize({ fromPage, toPage })}`;
 
         return this.httpService.get(uri, this.getConfig());
     }
 
-    public listDocuments(params?: Docuvision.ListDocumentsRequest): HttpRes<Docuvision.Document[]> {
+    listDocuments(params?: Docuvision.ListDocumentsRequest): HttpRes<Docuvision.Document[]> {
         const uri = `${docuvision.host}/v1/document${this.serialize(params)}`;
 
         return this.httpService.get(uri, this.getConfig());
     }
 
-    public deleteDocument(params?: Docuvision.DeleteDocumentRequest): HttpRes<boolean> {
+    deleteDocument(params?: Docuvision.DeleteDocumentRequest): HttpRes<boolean> {
         const uri = `${docuvision.host}/v1/document/${params.docId}`;
 
         return this.httpService.delete(uri, this.getConfig());
     }
 
-    public getPageImage(documentId: string, pageNumber: string): HttpRes<Docuvision.GetDocumentPageImageResponse> {
+    getPageImage(documentId: string, pageNumber: string): HttpRes<Docuvision.GetDocumentPageImageResponse> {
         const uri = `${docuvision.host}/v1/document/${documentId}/${pageNumber}.jpg`;
 
         return this.httpService.get(uri, {
+            responseType: 'arraybuffer',
             headers: {
                 Authorization: this.authHeader,
-                Accept: 'image/jpeg',
+                Accept: 'image/jpg',
             },
         });
     }
 
-    public async pollForCompletion(docId: string, maxWaitSeconds = 0): Promise<AxiosResponse<Docuvision.Document>> {
+    async pollForCompletion(docId: string, maxWaitSeconds = 0): Promise<AxiosResponse<Docuvision.Document>> {
         let waitedSeconds = 0;
         let response: AxiosResponse<Docuvision.Document>;
 
@@ -97,7 +94,7 @@ export class DocuvisionService {
         return response;
     }
 
-    public reachable(): Observable<boolean> {
+    reachable(): Observable<boolean> {
         const uri = `${docuvision.host}/v1/ping`;
 
         return this.httpService.get(uri, this.getConfig()).pipe(

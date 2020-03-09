@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "name": "server",
+      "cwd": "/opt/dist",
+      "script": "./src/main.js",
+      "log_file": "/opt/log/server.log",
+      "watch": true,
+      "ignore_watch": ["static"]
+    },
+    {
+      "name": "workers",
+      "cwd": "/opt/dist",
+      "script": "./src/modules/consumers/consumers.js",
+      "instances" : "1",
+      "exec_mode" : "cluster",
+      "log_file": "/opt/log/worker.log",
+      "watch": true,
+      "ignore_watch": ["static"]
+    }
+  ]
+}

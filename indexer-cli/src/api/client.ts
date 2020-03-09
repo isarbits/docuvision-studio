@@ -2,9 +2,9 @@ import { host } from 'config';
 import * as fs from 'fs';
 import { basename } from 'path';
 import * as superagent from 'superagent';
-import { Docuvision } from '../docuvision/docuvision.d';
+import { Docuvision } from '../docuvision';
 import { IndexDocument, IndexPage, IndexWord } from '../elastic/index.d';
-import { SearchResponse } from '../interfaces';
+import { SearchResponse } from '../elastic';
 
 export class StudioClient {
     private baseUri: string;
@@ -20,16 +20,19 @@ export class StudioClient {
             .catch(this.handleApiError);
     }
 
-    public upload(file: string, params: { waitForCompletion?: boolean, ocrEngine?: 'tesseract' | 'google' }): Promise<Docuvision.UploadResponse | Docuvision.Document> {
-        return superagent
-            .post(`${this.baseUri}/documents`)
-            .attach('file', fs.createReadStream(file), basename(file))
-            .field('waitForCompletion', !!params.waitForCompletion)
-            .catch(this.handleApiError);
+    public upload(file: string, params?: { ocrEngine?: 'tesseract' | 'google' }): Promise<Docuvision.UploadResponse | Docuvision.Document> {
+        const req = superagent.post(`${this.baseUri}/documents`).attach('file', fs.createReadStream(file), basename(file));
+
+        if (params?.ocrEngine) {
+            req.field('ocrEngine', params.ocrEngine);
+        }
+
+        return req.catch(this.handleApiError);
     }
 
     public documentExists(index: string, id: string) {
-        return superagent.post(`${this.baseUri}/search/${index}/count`)
+        return superagent
+            .post(`${this.baseUri}/search/${index}/count`)
             .send({ query: { term: { id } } })
             .then(({ body }) => 0 !== body.count)
             .catch(this.handleApiError);
@@ -38,25 +41,29 @@ export class StudioClient {
     public download(documentId: string, pageNumber: number, file: string): Promise<Docuvision.GetDocumentPageImageResponse> {
         const uri = `${this.baseUri}/documents/${documentId}/pages/${pageNumber}/downloads/${file}`;
 
-        return superagent.get(uri)
+        return superagent
+            .get(uri)
             .then(({ body }) => body)
             .catch(this.handleApiError);
     }
 
     public indexDocument(document: IndexDocument) {
-        return superagent.post(`${this.baseUri}/search/docuvision/index`)
+        return superagent
+            .post(`${this.baseUri}/search/docuvision/index`)
             .send(document)
             .catch(this.handleApiError);
     }
 
     public indexPage(page: IndexPage) {
-        return superagent.post(`${this.baseUri}/search/docuvision_page/index`)
+        return superagent
+            .post(`${this.baseUri}/search/docuvision_page/index`)
             .send(page)
             .catch(this.handleApiError);
     }
 
     public indexWord(word: IndexWord) {
-        return superagent.post(`${this.baseUri}/search/docuvision_word/index`)
+        return superagent
+            .post(`${this.baseUri}/search/docuvision_word/index`)
             .send(word)
             .catch(this.handleApiError);
     }
@@ -64,7 +71,8 @@ export class StudioClient {
     public indexWords(words: IndexWord[]) {
         const body = words.flatMap(word => [{ index: { _index: 'docuvision_word', _type: '_doc' } }, word]);
 
-        return superagent.post(`${this.baseUri}/search/docuvision_word/bulk`)
+        return superagent
+            .post(`${this.baseUri}/search/docuvision_word/bulk`)
             .send(body)
             .catch(this.handleApiError);
     }

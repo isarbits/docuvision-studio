@@ -1,5 +1,6 @@
 import React from 'react';
 import { DocuvisionPageHit, DocuvisionPageResult, EsTypeOf } from '../../../mappings/interfaces';
+import { baseUrl } from '../../../config';
 
 export class PageHitListItem extends React.Component<{
     bemBlocks: any;
@@ -17,14 +18,13 @@ export class PageHitListItem extends React.Component<{
                 )
             ) {
                 window
-                    .fetch(`/v1/documents/${id}`, { method: 'DELETE' })
+                    .fetch(`${baseUrl}/documents/${id}`, { method: 'DELETE' })
                     .then(() => window.location.reload())
                     .catch(console.error);
             }
         };
 
-        // FIXME: use backend so logic can be shared
-        const imagePath = `${source.document.id}/${source.page.pageNumber}/pageImage.jpg`;
+        const imagePath = `${baseUrl}/documents/${source.document.id}/pages/${source.page.pageNumber}/files/pageImage.jpg`;
 
         return (
             <div
@@ -32,11 +32,11 @@ export class PageHitListItem extends React.Component<{
                 style={{ position: 'relative', display: 'flex' }}
                 id={result._id}
             >
-                <a href={`/public/${imagePath}`} target="_blank" rel="noopener noreferrer">
+                <a href={imagePath} target="_blank" rel="noopener noreferrer">
                     <div
                         className="img-container"
                         style={{
-                            backgroundImage: `url("/public/${imagePath}")`,
+                            backgroundImage: `url("${imagePath}")`,
                         }}
                     />
                 </a>

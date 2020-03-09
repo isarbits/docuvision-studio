@@ -4,7 +4,7 @@ import { ValidationError } from 'class-validator';
 import { Response } from 'express';
 import { STATUS_CODES } from 'http';
 
-import { snakeCase } from '../../providers/string-utils.service';
+import { snakeCase } from '../../providers/string-utils';
 
 @Catch(BadRequestException)
 export class BadRequestExceptionFilter implements ExceptionFilter {

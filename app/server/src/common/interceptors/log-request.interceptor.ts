@@ -12,19 +12,19 @@ export class LogRequestInterceptor<T = any> implements NestInterceptor<T, T> {
     }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<T> {
-        const [{ method, url, params, body, query }, res] = context.getArgs();
+        const [req, res] = context.getArgs();
         let qs = '';
-        if (query) {
-            const queryString = Object.entries(query).reduce((acc, [k, v]) => acc.concat(`${k}=${v}`), []);
+        if (req.query) {
+            const queryString = Object.entries(req.query).reduce((acc, [k, v]) => acc.concat(`${k}=${v}`), []);
             if (queryString.length) {
                 qs = `?${queryString.join('&')}`;
             }
         }
-        void [params, body];
 
-        return next.handle().pipe(obs => {
-            this.loggingService.debug(`${method} ${url}${qs} => ${res.statusCode}`);
-            return obs;
+        res.on('finish', () => {
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            this.loggingService.debug(`[${ip}] ${req.method} ${req.originalUrl}${qs} => ${res.statusCode}`);
         });
+        return next.handle();
     }
 }

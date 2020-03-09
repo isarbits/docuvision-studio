@@ -1,0 +1,36 @@
+import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
+
+import { SharedModule } from '../../shared/shared.module';
+import { DocuvisionModule } from '../docuvision/docuvision.module';
+import { EventsModule } from '../events/events.module';
+import { QueueConnectionsModule } from '../queues/queue-connections.module';
+import { disableQueueStatsToken, QueuesService } from '../queues/queues.service';
+import { SearchModule } from '../search/search.module';
+import { ConsumersController } from './consumers.controller';
+import { ConsumersService } from './consumers.service';
+import { GetPageImageWorker } from './workers/get-page-image.worker';
+import { IndexDocumentWorker } from './workers/index-document.worker';
+import { IndexPageWorker } from './workers/index-page.worker';
+import { IndexWordWorker } from './workers/index-word.worker';
+import { PrepareDocumentWorker } from './workers/prepare-document.worker';
+
+const workers = [IndexWordWorker, IndexPageWorker, IndexDocumentWorker, GetPageImageWorker, PrepareDocumentWorker];
+
+const providers = [
+    ...workers,
+    ConsumersService,
+    QueuesService,
+    {
+        provide: disableQueueStatsToken,
+        useValue: false,
+    },
+];
+
+@Module({
+    imports: [ScheduleModule.forRoot(), SearchModule, QueueConnectionsModule, SharedModule, DocuvisionModule, EventsModule],
+    providers,
+    exports: providers,
+    controllers: [ConsumersController],
+})
+export class ConsumersModule {}

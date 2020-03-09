@@ -1,26 +1,20 @@
 version: "3"
 
 services:
-  es:
-    container_name: ds_elastic
-    image: isarbits/es-kibana
-    volumes:
-      - ./elasticdata:/home/elasticsearch/elasticsearch/data
-    ports:
-      - "9200:9200" # elastic
-      - "5601:5601" # kibana
-
   app:
     container_name: ds_dev_app
-    image: isarbits/docuvision-studio-app
+    image: isarbits/docuvision-studio-app:dev
     build:
       context: ../app
     restart: always
+    env_file: ../app/server/.env
     environment:
-      - PORT=8100
-      - ELASTICSEARCH_NODE=http://ds_elastic:9200
-      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       - NODE_ENV=development
+      - PORT=8100
+      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+      - DOCUVISION_HOST=${DOCUVISION_HOST}
+      - LOG_LEVELS=debug:none
+    network_mode: host
     ports:
       - "8100:8100"
     volumes:
@@ -28,11 +22,30 @@ services:
 
       - ../app/server/dist:/opt/dist
       - ../app/client/build:/client/build
-    command: npx nodemon --watch dist --exec 'cd dist && node src/main.js'
+    command: pm2-runtime /opt/pm2/pm2-config-watch.json
+    # command: pm2-runtime /opt/pm2/pm2-config-watch.json --only server
+
+  # workers:
+  #   container_name: ds_dev_workers
+  #   image: isarbits/docuvision-studio-app:dev
+  #   build:
+  #     context: ../app
+  #   restart: always
+  #   env_file: ../app/server/.env
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=8101
+  #     - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+  #     - DOCUVISION_HOST=${DOCUVISION_HOST}
+  #     - WORKER_SERVER_HOST=localhost:8100/v1
+  #   network_mode: host
+  #   volumes:
+  #     - ../app/server/dist:/opt/dist
+  #   command: pm2-runtime /opt/pm2/pm2-config-watch.json --only workers
 
   indexer:
     container_name: ds_dev_indexer
-    image: isarbits/docuvision-studio-indexer
+    image: isarbits/docuvision-studio-indexer:dev
     build:
       context: ../indexer-cli
     restart: always
@@ -49,5 +62,17 @@ services:
       - ../indexer-cli/dist:/opt/dist
     command: npx nodemon --exec 'node ./src/index.js index --watch /data'
 
-volumes:
-  esdata:
+  es:
+    container_name: ds_elastic
+    image: isarbits/es-kibana
+    volumes:
+      - ./elasticdata:/home/elasticsearch/elasticsearch/data
+    ports:
+      - "9200:9200" # elastic
+      - "5601:5601" # kibana
+
+  redis:
+    container_name: ds_redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
