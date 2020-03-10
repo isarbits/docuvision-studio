@@ -4,7 +4,9 @@
       "name": "server",
       "cwd": "/opt/dist",
       "script": "./src/main.js",
-      "log_file": "/opt/log/server.log"
+      "log_file": "/opt/log/server.log",
+      "error_file": "/opt/log/error-server.log",
+      "instance_var": "INSTANCE_ID"
     },
     {
       "name": "workers",
@@ -12,7 +14,9 @@
       "script": "./src/modules/consumers/consumers.js",
       "instances" : "1",
       "exec_mode" : "cluster",
-      "log_file": "/opt/log/worker.log"
+      "log_file": "/opt/log/worker.log",
+      "error_file": "/opt/log/error-worker.log",
+      "instance_var": "INSTANCE_ID"
     }
   ]
 }

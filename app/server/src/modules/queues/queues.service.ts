@@ -9,7 +9,7 @@ import { GeneratorService } from '../../shared/generator/generator.service';
 import { LoggingService } from '../../shared/logging/logging.service';
 import { EventsService } from '../events/events.service';
 
-export const disableQueueStatsToken = 'DISABLE_CRON';
+export const DISABLE_QUEUE_STATS = 'DISABLE_QUEUE_STATS';
 
 const HISTORY_SECONDS = 60 * 60;
 
@@ -17,6 +17,13 @@ interface TrendLine {
     m: number;
     b: number;
 }
+
+export const RateIntervals = {
+    ONE_HOUR: 0,
+    HALF_HOUR: 1,
+    FIVE_MINS: 2,
+    ONE_MINUTE: 3,
+};
 
 export interface QueueInfo {
     current: JobCounts;
@@ -36,7 +43,7 @@ export class QueuesService {
         private readonly loggingService: LoggingService,
         private readonly generatorService: GeneratorService,
         private readonly eventsService: EventsService,
-        @Optional() @Inject(disableQueueStatsToken) private readonly doCron: boolean = true,
+        @Optional() @Inject(DISABLE_QUEUE_STATS) private readonly disableQueueStats: boolean = false,
         @Optional() private readonly queueInfo: QueueInfo,
     ) {
         this.queueInfo = { current: null, history: [], rates: {} as any };
@@ -52,9 +59,9 @@ export class QueuesService {
     }
 
     empty() {
-        return Promise.all([
+        return Promise.all<any>([
             ...['completed', 'wait', 'active', 'delayed', 'failed'].map(name => this.processingQueue.clean(0, name as JobStatusClean)),
-            this.processingQueue.empty() as any,
+            this.processingQueue.empty(),
         ]);
     }
 
@@ -75,7 +82,7 @@ export class QueuesService {
 
         this.queueInfo.history = [this.queueInfo.current, ...this.queueInfo.history].splice(0, HISTORY_SECONDS);
 
-        if (!this.doCron) {
+        if (this.disableQueueStats) {
             return;
         }
 
@@ -84,7 +91,7 @@ export class QueuesService {
         this.eventsService.emit('queue-stats', this.queueInfo);
     }
 
-    // TODO: goodify
+    // TODO: optimize
     computeTrendRates() {
         const completedValues = [];
         const waitingValues = [];
@@ -100,29 +107,39 @@ export class QueuesService {
             failedValues.push(failed);
         }
 
-        // const MINUTE = 60;
+        const MINUTE = 60;
         const FIVE_MINS = 60 * 5;
-        // const HALF_HOUR = 60 * 30;
+        const HALF_HOUR = 60 * 30;
 
         this.queueInfo.rates.completed = [
             findLineByLeastSquares(completedValues),
+            findLineByLeastSquares(completedValues.slice(completedValues.length - HALF_HOUR, completedValues.length)),
             findLineByLeastSquares(completedValues.slice(completedValues.length - FIVE_MINS, completedValues.length)),
+            findLineByLeastSquares(completedValues.slice(completedValues.length - MINUTE, completedValues.length)),
         ];
         this.queueInfo.rates.waiting = [
             findLineByLeastSquares(waitingValues),
-            findLineByLeastSquares(waitingValues.slice(completedValues.length - FIVE_MINS, waitingValues.length)),
+            findLineByLeastSquares(waitingValues.slice(waitingValues.length - HALF_HOUR, waitingValues.length)),
+            findLineByLeastSquares(waitingValues.slice(waitingValues.length - FIVE_MINS, waitingValues.length)),
+            findLineByLeastSquares(waitingValues.slice(waitingValues.length - MINUTE, waitingValues.length)),
         ];
         this.queueInfo.rates.active = [
             findLineByLeastSquares(activeValues),
-            findLineByLeastSquares(activeValues.slice(completedValues.length - FIVE_MINS, activeValues.length)),
+            findLineByLeastSquares(activeValues.slice(activeValues.length - HALF_HOUR, activeValues.length)),
+            findLineByLeastSquares(activeValues.slice(activeValues.length - FIVE_MINS, activeValues.length)),
+            findLineByLeastSquares(activeValues.slice(activeValues.length - MINUTE, activeValues.length)),
         ];
         this.queueInfo.rates.delayed = [
             findLineByLeastSquares(delayedValues),
-            findLineByLeastSquares(delayedValues.slice(completedValues.length - FIVE_MINS, delayedValues.length)),
+            findLineByLeastSquares(delayedValues.slice(delayedValues.length - HALF_HOUR, delayedValues.length)),
+            findLineByLeastSquares(delayedValues.slice(delayedValues.length - FIVE_MINS, delayedValues.length)),
+            findLineByLeastSquares(delayedValues.slice(delayedValues.length - MINUTE, delayedValues.length)),
         ];
         this.queueInfo.rates.failed = [
             findLineByLeastSquares(failedValues),
-            findLineByLeastSquares(failedValues.slice(completedValues.length - FIVE_MINS, failedValues.length)),
+            findLineByLeastSquares(failedValues.slice(failedValues.length - HALF_HOUR, failedValues.length)),
+            findLineByLeastSquares(failedValues.slice(failedValues.length - FIVE_MINS, failedValues.length)),
+            findLineByLeastSquares(failedValues.slice(failedValues.length - MINUTE, failedValues.length)),
         ];
     }
 }

@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { SharedModule } from '../../shared/shared.module';
 import { DocuvisionModule } from '../docuvision/docuvision.module';
 import { EventsModule } from '../events/events.module';
 import { QueueConnectionsModule } from '../queues/queue-connections.module';
-import { disableQueueStatsToken, QueuesService } from '../queues/queues.service';
+import { DISABLE_QUEUE_STATS, QueuesService } from '../queues/queues.service';
 import { SearchModule } from '../search/search.module';
 import { ConsumersController } from './consumers.controller';
 import { ConsumersService } from './consumers.service';
@@ -17,20 +17,27 @@ import { PrepareDocumentWorker } from './workers/prepare-document.worker';
 
 const workers = [IndexWordWorker, IndexPageWorker, IndexDocumentWorker, GetPageImageWorker, PrepareDocumentWorker];
 
-const providers = [
-    ...workers,
-    ConsumersService,
-    QueuesService,
-    {
-        provide: disableQueueStatsToken,
-        useValue: false,
-    },
-];
+const providers = [...workers, QueuesService, { provide: DISABLE_QUEUE_STATS, useValue: true }];
 
 @Module({
-    imports: [ScheduleModule.forRoot(), SearchModule, QueueConnectionsModule, SharedModule, DocuvisionModule, EventsModule],
+    imports: [SearchModule, QueueConnectionsModule, SharedModule, DocuvisionModule, EventsModule],
     providers,
     exports: providers,
-    controllers: [ConsumersController],
 })
-export class ConsumersModule {}
+export class ConsumersModule {
+    static forRoot(): DynamicModule {
+        if (!process.env.PM2_HOME) {
+            throw new Error('ConsumersModule.forRoot requires pm2');
+        }
+
+        const rootProviders = [...providers, ConsumersService];
+
+        return {
+            module: ConsumersModule,
+            imports: [ScheduleModule.forRoot()],
+            providers: rootProviders,
+            exports: rootProviders,
+            controllers: [ConsumersController],
+        };
+    }
+}

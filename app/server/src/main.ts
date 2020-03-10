@@ -79,12 +79,12 @@ const bootstrap = async () => {
 
     log.info(
         '\n',
+        `  server running ${await app.getUrl()} (${Date.now() - start}ms)\n`,
         `  transportPort : ${config.transportPort}\n`,
         `  staticDir     : ${config.paths.staticDir}\n`,
         `  assetsDir     : ${config.paths.assetsDir}\n`,
         `  logLevel      : ${config.logging.logLevel}\n`,
         `  elastic       : ${config.elasticsearch.node}\n`,
-        `  server running ${await app.getUrl()} (${Date.now() - start}ms)`,
     );
 };
 

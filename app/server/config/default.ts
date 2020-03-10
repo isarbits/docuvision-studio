@@ -10,6 +10,10 @@ const port = Number(process.env.PORT || 8100);
 const apiBaseUri = `${host}:${port}/${apiPrefix}`;
 const serverHost = 'http://localhost:8100/v1';
 
+const pm2AppName = 'workers';
+const standalone = !process.env.PM2_HOME;
+const workerIsClusterMaster = !standalone && process.env.name === pm2AppName && process.env.INSTANCE_ID === '0';
+
 const config = {
     app: 'Docuvision Studio Backend',
     serverHost,
@@ -45,12 +49,14 @@ const config = {
         port: process.env.REDIS_PORT || 6379,
     },
     workers: {
-        cluster: {
-            max: Number(process.env.WORKERS_CLUSER_MAX ?? 10),
-            min: Number(process.env.WORKERS_CLUSER_MAX ?? 0),
-            autoScale: process.env.WORKERS_CLUSER_MAX ? !!process.env.WORKERS_CLUSER_MAX : true,
-        },
+        pm2AppName,
         serverHost: process.env.WORKER_SERVER_HOST || apiBaseUri,
+        cluster: {
+            port: Number(process.env.WORKERS_CLUSER_PORT || 8101),
+            max: Number(process.env.WORKERS_CLUSER_MAX ?? 5),
+            min: Math.max(1, Number(process.env.WORKERS_CLUSER_MAX ?? 1)),
+            autoScale: process.env.WORKERS_CLUSER_AUTO_SCALE === 'true' && workerIsClusterMaster,
+        },
     }
 };
 

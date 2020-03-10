@@ -23,13 +23,12 @@ export class ConsumersController {
     @Put()
     @HttpCode(HttpStatus.ACCEPTED)
     updateConsumers(@Body('count') count: number) {
-        console.log(count);
         return this.consumersService.set(count);
     }
 
     @Delete()
     @HttpCode(HttpStatus.NO_CONTENT)
-    removeConsumers(@Query('count') count?: string) {
+    removeConsumers(@Query('count') count?: number) {
         return this.consumersService.remove(count);
     }
 }
