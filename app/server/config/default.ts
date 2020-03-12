@@ -22,6 +22,7 @@ const config = {
     port,
     apiBaseUri,
     transportPort: Number(process.env.TRANSPORT_PORT ?? 4000),
+    externalWorkers: process.env.EXTERNAL_WORKERS === 'true',
     paths: {
         projectRoot: resolve(__dirname, '..'),
         tempPath: resolve(__dirname, '..', 'tmp'),
@@ -54,8 +55,12 @@ const config = {
         cluster: {
             port: Number(process.env.WORKERS_CLUSER_PORT || 8101),
             max: Number(process.env.WORKERS_CLUSER_MAX ?? 5),
-            min: Math.max(1, Number(process.env.WORKERS_CLUSER_MAX ?? 1)),
+            min: Math.max(1, Number(process.env.WORKERS_CLUSER_MIN ?? 1)),
             autoScale: process.env.WORKERS_CLUSER_AUTO_SCALE === 'true' && workerIsClusterMaster,
+            ioMax: Number(process.env.WORKERS_CLUSER_IO_MAX || 200),
+            waitMax: Number(process.env.WORKERS_CLUSER_WAIT_MAX || 5000),
+            memMax: process.env.WORKERS_CLUSER_MEM_MAX || '1GB',
+            cpuMax: Number(process.env.WORKERS_CLUSER_CPU_MAX || 80),
         },
     }
 };

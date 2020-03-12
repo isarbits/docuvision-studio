@@ -2,29 +2,38 @@ import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { exec } from 'child_process';
 import { workers } from 'config';
+import { cpus } from 'os';
 import { promisify } from 'util';
 
 import { ClusterOnly } from '../../common/decorators/cluster-only.decorator';
 import { LoggingService } from '../../shared/logging/logging.service';
+import { UtilsService } from '../../shared/utils/utils.service';
 import { QueuesService, RateIntervals } from '../queues/queues.service';
 
+interface Proc {
+    cpu: number;
+    memory: number;
+}
+
 interface AppInfo {
-    monit: {
-        cpu: number;
-        memory: number;
-    };
+    monit: Proc;
     name: string;
     pid: number;
     instanceId: number;
     pm_id: number;
 }
 
-const UPSCALE_IO_RATIO = process.env.UPSCALE_IO_RATIO || 200;
-const UPSCALE_WAIT_MAX = process.env.UPSCALE_WAIT_MAX || 5000;
-
 @Injectable()
 export class ConsumersService {
-    constructor(private readonly loggingService: LoggingService, private readonly queuesService: QueuesService) {}
+    private maxBytes: number;
+
+    constructor(
+        private readonly loggingService: LoggingService,
+        private readonly queuesService: QueuesService,
+        private readonly utilsService: UtilsService,
+    ) {
+        this.maxBytes = this.utilsService.humanToBytes(workers.cluster.memMax);
+    }
 
     @ClusterOnly()
     async getConsumers(): Promise<AppInfo[]> {
@@ -76,8 +85,12 @@ export class ConsumersService {
         const consumers = await this.getConsumers();
         const newValue = Math.max(1, consumers.length - num);
 
-        if (consumers.length <= workers.cluster.min || consumers.length === newValue) {
-            return { message: false, count: consumers.length };
+        if (consumers.length <= workers.cluster.min) {
+            return { message: false, count: consumers.length, reason: `at min (${workers.cluster.min})` };
+        }
+
+        if (consumers.length === newValue) {
+            return { message: false, count: consumers.length, reason: `same count ${newValue}` };
         }
 
         const slavePids: number[] = consumers.reduce((slaves, consumer) => {
@@ -85,10 +98,10 @@ export class ConsumersService {
         }, []);
 
         if (!slavePids.length) {
-            return { message: false, count: consumers.length };
+            return { message: false, count: consumers.length, reason: 'no slaves' };
         }
 
-        await this.exec(`pm2 delete ${slavePids.join(' ')}`);
+        await this.exec(`pm2 delete ${slavePids.slice(0, consumers.length - newValue).join(' ')}`);
 
         return { message: true, count: newValue };
     }
@@ -108,22 +121,46 @@ export class ConsumersService {
 
             const inOutRatio = rates.waiting[RateIntervals.ONE_MINUTE].m;
 
-            if (inOutRatio > UPSCALE_IO_RATIO || current.waiting > UPSCALE_WAIT_MAX) {
+            const proc = await this.getConsumerUtilization();
+
+            if (inOutRatio > workers.cluster.ioMax || current.waiting > workers.cluster.waitMax) {
+                if (proc.cpu >= workers.cluster.cpuMax || proc.memory >= this.maxBytes) {
+                    return;
+                }
+
                 const added = await this.add(1);
 
                 if (added.message === true) {
-                    this.loggingService.server(`Added worker (io:${inOutRatio}, wait:${current.waiting}, count:${added.count})`);
+                    this.loggingService.server(`Added worker (io:${inOutRatio}, wait:${current.waiting}, count:${added.count})`, proc);
                 }
-            } else if (current.waiting === 0) {
+            } else if (current.waiting === 0 || proc.cpu > workers.cluster.cpuMax + 10 || proc.memory > this.maxBytes + 1024) {
                 const removed = await this.remove(1);
 
                 if (removed.message === true) {
-                    this.loggingService.server(`Removed worker (io:${inOutRatio}, wait:${current.waiting}, count:${removed.count})`);
+                    this.loggingService.server(`Removed worker (io:${inOutRatio}, wait:${current.waiting}, count:${removed.count})`, proc);
                 }
             }
         } catch (e) {
             this.loggingService.error('ConsumersService:checkWorkerStatus caught error:', e);
         }
+    }
+
+    private async getConsumerUtilization() {
+        const consumers = await this.getConsumers();
+        const threads = cpus().length;
+
+        return consumers.reduce(
+            (proc: Proc, consumer: AppInfo) => {
+                proc.cpu += consumer.monit.cpu / threads;
+                proc.memory += consumer.monit.memory;
+
+                return proc;
+            },
+            {
+                cpu: 0,
+                memory: 0,
+            },
+        );
     }
 
     private validate(count: number): number {

@@ -11,7 +11,7 @@ const loggingService = new LoggingService('Workers');
 
 const boostrap = async () => {
     const consumerModule = workers.cluster.autoScale ? ConsumersModule.forRoot() : ConsumersModule;
-    const procTitle = process.env.INSTANCE_ID ? `${process.env.INSTANCE_ID}:${process.env.name}` : 'standalone';
+    const procTitle = process.env.INSTANCE_ID ? `${process.env.name}${process.env.INSTANCE_ID}` : 'standalone';
 
     const app = await NestFactory.create<NestExpressApplication>(consumerModule);
     await app.listen(workers.cluster.autoScale ? workers.cluster.port : null);
@@ -23,7 +23,10 @@ const boostrap = async () => {
         ` serverHost        : ${workers.serverHost}\n`,
         ` cluster.max       : ${workers.cluster.max}\n`,
         ` cluster.min       : ${workers.cluster.min}\n`,
-        ` cluster.autoScale : ${workers.cluster.autoScale}\n`,
+        ` cluster.ioMax     : ${workers.cluster.ioMax}\n`,
+        ` cluster.waitMax   : ${workers.cluster.waitMax}\n`,
+        ` cluster.memMax    : ${workers.cluster.memMax}\n`,
+        ` cluster.cpuMax    : ${workers.cluster.cpuMax}\n`,
     );
 
     if (workers.cluster.autoScale) {

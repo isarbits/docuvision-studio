@@ -4,9 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { GeneratorService } from './generator/generator.service';
 import { LoggingModule } from './logging/logging.module';
 import { FileSystemService } from './storage/filesystem.service';
+import { UtilsService } from './utils/utils.service';
 import { ValidatorService } from './validator/validator.service';
 
-const providers = [ValidatorService, GeneratorService, FileSystemService];
+const providers = [UtilsService, ValidatorService, GeneratorService, FileSystemService];
 
 @Module({
     providers,
