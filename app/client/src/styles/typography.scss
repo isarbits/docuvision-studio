@@ -1,0 +1,89 @@
+.small {
+    font-size: 0.875em;
+}
+
+$size-8: 2rem;
+$size-7: 1.75rem;
+$size-6: 1.5rem;
+$size-5: 1.25rem;
+$size-4: 1rem;
+$size-3: 0.75rem;
+$size-2: 0.5rem;
+$size-1: 0.25rem;
+
+$sizes: (
+    ("8", 2rem),
+    ("7", 1.75rem),
+    ("6", 1.5rem),
+    ("5", 1.25rem),
+    ("4", 1rem),
+    ("3", 0.75rem),
+    ("2", 0.5rem),
+    ("1", 0.25rem)
+);
+
+@each $s in $sizes {
+    .mx-#{nth($s, 1)} {
+        margin-left: #{nth($s, 2)};
+        margin-right: #{nth($s, 2)};
+    }
+
+    .my-#{nth($s, 1)} {
+        margin-bottom: #{nth($s, 2)};
+        margin-top: #{nth($s, 2)};
+    }
+
+    .ml-#{nth($s, 1)} {
+        margin-left: #{nth($s, 2)};
+    }
+
+    .mr-#{nth($s, 1)} {
+        margin-right: #{nth($s, 2)};
+    }
+
+    .mt-#{nth($s, 1)} {
+        margin-top: #{nth($s, 2)};
+    }
+
+    .mb-#{nth($s, 1)} {
+        margin-bottom: #{nth($s, 2)};
+    }
+
+    .ma-#{nth($s, 1)} {
+        margin: #{nth($s, 2)};
+    }
+
+    .px-#{nth($s, 1)} {
+        padding-left: #{nth($s, 2)};
+        padding-right: #{nth($s, 2)};
+    }
+
+    .py-#{nth($s, 1)} {
+        padding-bottom: #{nth($s, 2)};
+        padding-top: #{nth($s, 2)};
+    }
+
+    .pl-#{nth($s, 1)} {
+        padding-left: #{nth($s, 2)};
+    }
+
+    .pr-#{nth($s, 1)} {
+        padding-right: #{nth($s, 2)};
+    }
+
+    .pt-#{nth($s, 1)} {
+        padding-top: #{nth($s, 2)};
+    }
+
+    .pb-#{nth($s, 1)} {
+        padding-bottom: #{nth($s, 2)};
+    }
+
+    .pa-#{nth($s, 1)} {
+        padding: #{nth($s, 2)};
+    }
+
+    .text-size-#{nth($s, 1)} {
+        font-size: #{nth($s, 2)};
+    }
+}

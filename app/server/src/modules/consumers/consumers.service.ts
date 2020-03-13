@@ -9,19 +9,7 @@ import { ClusterOnly } from '../../common/decorators/cluster-only.decorator';
 import { LoggingService } from '../../shared/logging/logging.service';
 import { UtilsService } from '../../shared/utils/utils.service';
 import { QueuesService, RateIntervals } from '../queues/queues.service';
-
-interface Proc {
-    cpu: number;
-    memory: number;
-}
-
-interface AppInfo {
-    monit: Proc;
-    name: string;
-    pid: number;
-    instanceId: number;
-    pm_id: number;
-}
+import { AppInfo, AppProc } from './consumers.d';
 
 @Injectable()
 export class ConsumersService {
@@ -150,7 +138,7 @@ export class ConsumersService {
         const threads = cpus().length;
 
         return consumers.reduce(
-            (proc: Proc, consumer: AppInfo) => {
+            (proc: AppProc, consumer: AppInfo) => {
                 proc.cpu += consumer.monit.cpu / threads;
                 proc.memory += consumer.monit.memory;
 

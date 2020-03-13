@@ -1,20 +1,21 @@
-# FE
-FROM node:erbium AS client
-COPY client/package.json client/package-lock.json ./
-
-RUN npm install
-
-COPY client ./
-
-RUN npm run build
-
 # BE
 FROM node:erbium AS dist
 COPY server/package.json server/package-lock.json ./
 
 RUN npm install
 
-COPY server ./
+COPY server .
+
+RUN npm run build
+
+# FE
+FROM node:erbium AS client
+COPY client/package.json client/package-lock.json ./
+
+RUN npm install
+
+COPY client .
+COPY --from=dist . server
 
 RUN npm run build
 

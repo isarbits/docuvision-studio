@@ -76,13 +76,30 @@ export class QueueChart extends React.Component<Props, State> {
         waiting: 4,
     };
 
+    private historyToIndex = {
+        3600: 0,
+        1800: 1,
+        300: 2,
+        60: 3,
+    };
+
+    // private addRateToChart = (rate): number[] => {
+    //     const length = this.props.historySeconds || 60;
+
+    //     const m = rate.m;
+    //     const b = rate.b;
+
+    //     return Array.from(Array(length).keys()).map((x, _, a) => (m * x) + (a.length - b));
+    // }
+
     private convertToChart = (data: QueueData) => {
         const { rates, history, current } = data;
         if (current === null) {
             return null;
         }
 
-        const length = this.props.historySeconds ?? 60;
+        const length = this.props.historySeconds || 60;
+
         let dataByStateName = history
             .slice(0, length)
             .reverse()
@@ -106,7 +123,10 @@ export class QueueChart extends React.Component<Props, State> {
         Object.keys(this.stateToIndex).forEach(state => {
             chartData[state] = {
                 labels,
-                series: [dataByStateName[this.stateToIndex[state]]],
+                series: [
+                    dataByStateName[this.stateToIndex[state]],
+                    // this.addRateToChart(rates[state][this.historyToIndex[length]])
+                ],
             };
         });
 
@@ -142,10 +162,10 @@ export class QueueChart extends React.Component<Props, State> {
             'queue-stats',
             data => this.convertToChart(data),
             (err, evnt) => {
-                console.log(err, evnt);
                 if (typeof this?.props?.onDisconnect === 'function') {
-                    this.props.onDisconnect();
+                    return this.props.onDisconnect();
                 }
+                console.log(err, evnt);
             },
         );
     };
@@ -158,13 +178,8 @@ export class QueueChart extends React.Component<Props, State> {
         }
 
         const getRate = queue => {
-            switch (this.props.historySeconds) {
-                case 60:
-                    return queue[0].m.toFixed(1);
-                case 60 * 5:
-                default:
-                    return queue[1].m.toFixed(1);
-            }
+            const length = this.props.historySeconds || 60;
+            return (queue[this.historyToIndex[length]].m || 0).toFixed(1);
         };
 
         const options: ILineChartOptions = this.props.lineOptions || {

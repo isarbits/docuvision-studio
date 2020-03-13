@@ -16,14 +16,18 @@ export class IndexPageWorker implements WorkerInterface<IndexPageJobData> {
     readonly jobName = Queues.INDEX_PAGE;
 
     constructor(
-        @InjectQueue('processing') readonly processingQueue: Queue,
+        @InjectQueue('processing') readonly queue: Queue,
         readonly loggingService: LoggingService,
         private readonly httpService: HttpService,
     ) {
-        this.processingQueue.process(this.jobName, this.work.bind(this));
+        this.queue.process(this.jobName, this.work.bind(this));
     }
 
     async work(job: Job<IndexPageJobData>) {
+        if (job.data.error) {
+            return;
+        }
+
         const { pages, ...document } = job.data.document;
         const page = pages[job.data.pageNumber - 1];
 

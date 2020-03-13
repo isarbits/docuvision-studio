@@ -1,6 +1,6 @@
 import { InjectQueue } from '@nestjs/bull';
 import { BeforeApplicationShutdown, Injectable, Optional } from '@nestjs/common';
-import { Job, Queue } from 'bull';
+import { Job, JobId, Queue } from 'bull';
 
 import { LoggingService } from '../../shared/logging/logging.service';
 import { EventsService } from '../events/events.service';
@@ -38,86 +38,110 @@ export class QueueEventsService implements BeforeApplicationShutdown {
         // this.processingQueue.on('global:removed', this.onQueueRemoved.bind(this));
     }
 
-    async onQueueCompleted(jobId: string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        const message = `[${this.processingQueue.name}:${job.name}] @Completed:`;
+    async onQueueCompleted(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Completed', job.name);
 
         this.emit('completed', message, job);
-
-        // this.messagesQueue.add({ message, jobId });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Completed:`, jobId);
     }
 
-    async onQueueFailed(jobId: string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        const message = `[${this.processingQueue.name}:${job.name}] @Failed:`;
+    async onQueueFailed(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Failed', job.name);
 
         this.emit('failed', message, job);
 
-        this.loggingService.warn(`[${this.processingQueue.name}:${job.name}] @Failed:`, job);
+        this.loggingService.warn(message, job);
         this.messagesQueue.add({ message, job });
     }
 
     onQueueError(error: Error) {
-        const message = `[${this.processingQueue.name}] @Error:`;
+        const message = this.buildMessage('Error');
 
         this.emit('error', message, error);
 
-        this.loggingService.warn(`[${this.processingQueue.name}] @Error:`, error);
+        this.loggingService.warn(message, error);
         this.messagesQueue.add({ message, error });
     }
 
-    async onQueueActive(jobId: string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}:${job.name}] @Active:`, jobId });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Active:`, jobId);
+    async onQueueActive(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Active', job.name);
+
+        this.messagesQueue.add({ message, jobId });
     }
 
-    async onQueueWaiting(jobId: number | string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}:${job.name}] @Waiting:`, jobId });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Waiting:`, jobId);
+    async onQueueWaiting(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Wating', job.name);
+
+        this.messagesQueue.add({ message, jobId });
     }
 
-    async onQueueStalled(jobId: string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}:${job.name}] @Stalled:`, jobId });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Stalled:`, jobId);
+    async onQueueStalled(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Stalled', job.name);
+
+        this.messagesQueue.add({ message, jobId });
     }
 
-    async onQueueProgress(jobId: string, progress: number) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}:${job.name}] @Progress:`, jobId, progress });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Progress:`, jobId, progress);
+    async onQueueProgress(jobId: JobId, progress: number) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Progress', job.name);
+
+        this.messagesQueue.add({ message, jobId, progress });
     }
 
     onQueuePaused() {
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}] @Paused:` });
-        // this.loggingService.debug(`[${this.processingQueue.name}] @Paused:`);
+        const message = this.buildMessage('Paused');
+
+        this.messagesQueue.add({ message });
     }
 
-    async onQueueResumed(jobId: string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}:${job.name}] @Resumed:`, jobId });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Resumed:`, jobId);
+    async onQueueResumed(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Resumed', job.name);
+
+        this.messagesQueue.add({ message, jobId });
     }
 
-    async onQueueCleaned(jobIds: string[], type: string) {
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}] @Cleaned:`, jobIds, type });
-        // this.loggingService.debug(`[${this.processingQueue.name}] @Cleaned:`, jobIds, type);
-        // const jobs = await Promise.all(jobIds.map(this.processingQueue.getJob))
-        // console.log(jobs, type);
+    async onQueueCleaned(jobIds: JobId[], type: string) {
+        const message = this.buildMessage('Cleaned', jobIds.join(' '));
+
+        this.messagesQueue.add({ message, jobIds, type });
+        // const jobs = await Promise.all(jobIds.map(this.getJob))
     }
 
     onQueueDrained() {
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}] @Drained:` });
-        // this.loggingService.debug(`[${this.processingQueue.name}] @Drained:`);
+        const message = this.buildMessage('Drained');
+
+        this.messagesQueue.add({ message });
     }
 
-    async onQueueRemoved(jobId: string) {
-        const job: Job = await this.processingQueue.getJob(jobId);
-        this.messagesQueue.add({ message: `[${this.processingQueue.name}:${job.name}] @Removed:`, jobId });
-        // this.loggingService.debug(`[${this.processingQueue.name}:${job.name}] @Removed:`, jobId);
+    async onQueueRemoved(jobId: JobId) {
+        const job = await this.getJob(jobId);
+        const message = this.buildMessage('Removed', job.name);
+
+        this.messagesQueue.add({ message, jobId });
+    }
+
+    private async getJob(jobId: JobId, allFields = false): Promise<Partial<Job>> {
+        let job: Job = await this.processingQueue.getJob(jobId);
+
+        if (!allFields) {
+            const { queue, ...rest } = job;
+
+            job = {
+                ...rest,
+                queue: { name: queue.name } as any,
+            };
+        }
+
+        return job;
+    }
+
+    private buildMessage(event: string, jobName?: string) {
+        return `@${event} [${this.processingQueue.name}${jobName ? `:${jobName}` : ''}]`;
     }
 
     private emit(type: string, message: string, data: any) {

@@ -15,13 +15,19 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "downlevelIteration": true,
     "noUnusedLocals": true,
     "noImplicitAny": false,
     "noUnusedParameters": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "isolatedModules": true
   },
+  "references": [
+    {
+      "path": "../server"
+    }
+  ],
   "include": [
     "src"
   ]

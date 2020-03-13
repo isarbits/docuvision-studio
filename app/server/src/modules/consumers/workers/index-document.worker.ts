@@ -12,11 +12,11 @@ export class IndexDocumentWorker implements WorkerInterface<IndexDocument> {
     readonly jobName = Queues.INDEX_DOCUMENT;
 
     constructor(
-        @InjectQueue('processing') readonly processingQueue: Queue,
+        @InjectQueue('processing') readonly queue: Queue,
         readonly loggingService: LoggingService,
         private readonly httpService: HttpService,
     ) {
-        this.processingQueue.process(this.jobName, this.work.bind(this));
+        this.queue.process(this.jobName, this.work.bind(this));
     }
 
     async work(job: Job<IndexDocument>) {

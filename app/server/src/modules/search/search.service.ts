@@ -2,9 +2,10 @@ import { RequestParams } from '@elastic/elasticsearch';
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 
+const WRITE_POOL_SIZE = 150; // default is 200
+
 @Injectable()
 export class SearchService {
-    writePoolSize = 150; // default is 200
     private indexWriteQueue: { [index: string]: Promise<any>[] } = {};
 
     constructor(private readonly elasticsearchService: ElasticsearchService) {
@@ -53,7 +54,7 @@ export class SearchService {
     }
 
     private async bufferedWrite<T = any>(index: string, req: () => Promise<T>): Promise<T> {
-        if (this.indexWriteQueue[index]?.length >= this.writePoolSize) {
+        if (this.indexWriteQueue[index]?.length >= WRITE_POOL_SIZE) {
             await Promise.all(this.indexWriteQueue[index].splice(0, this.indexWriteQueue[index].length));
         }
 

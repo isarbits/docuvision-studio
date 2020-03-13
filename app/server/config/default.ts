@@ -8,25 +8,23 @@ const apiPrefix = process.env.API_PREFIX || 'v1';
 const host = process.env.HOST || 'http://localhost';
 const port = Number(process.env.PORT || 8100);
 const apiBaseUri = `${host}:${port}/${apiPrefix}`;
-const serverHost = 'http://localhost:8100/v1';
 
+const serverHost = 'http://localhost:8100/v1';
 const pm2AppName = 'workers';
 const standalone = !process.env.PM2_HOME;
 const workerIsClusterMaster = !standalone && process.env.name === pm2AppName && process.env.INSTANCE_ID === '0';
 
 const config = {
     app: 'Docuvision Studio Backend',
-    serverHost,
     apiPrefix,
     host,
     port,
     apiBaseUri,
-    transportPort: Number(process.env.TRANSPORT_PORT ?? 4000),
     externalWorkers: process.env.EXTERNAL_WORKERS === 'true',
     paths: {
         projectRoot: resolve(__dirname, '..'),
         tempPath: resolve(__dirname, '..', 'tmp'),
-        staticDir: process.env.PATHS_STATIC_DIR || resolve(__dirname, '../../../client/build'),
+        publicDir: process.env.PATHS_PUBLIC_DIR || resolve(__dirname, '../../../client/build'),
         assetsDir: process.env.PATHS_ASSETS_DIR || resolve(__dirname, '../static'),
     },
     logging: {
@@ -51,7 +49,7 @@ const config = {
     },
     workers: {
         pm2AppName,
-        serverHost: process.env.WORKER_SERVER_HOST || apiBaseUri,
+        serverHost: process.env.WORKERS_SERVER_HOST || serverHost,
         cluster: {
             port: Number(process.env.WORKERS_CLUSER_PORT || 8101),
             max: Number(process.env.WORKERS_CLUSER_MAX ?? 5),
@@ -59,8 +57,8 @@ const config = {
             autoScale: process.env.WORKERS_CLUSER_AUTO_SCALE === 'true' && workerIsClusterMaster,
             ioMax: Number(process.env.WORKERS_CLUSER_IO_MAX || 200),
             waitMax: Number(process.env.WORKERS_CLUSER_WAIT_MAX || 5000),
-            memMax: process.env.WORKERS_CLUSER_MEM_MAX || '1GB',
-            cpuMax: Number(process.env.WORKERS_CLUSER_CPU_MAX || 80),
+            memMax: process.env.WORKERS_CLUSER_MEM_MAX || '1 GB',
+            cpuMax: Math.min(Number(process.env.WORKERS_CLUSER_CPU_MAX || 80), 100),
         },
     }
 };

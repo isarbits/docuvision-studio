@@ -55,7 +55,7 @@ export class DocumentsController {
     @Get(':documentId/pages/:pageNum/downloads/:file')
     @HttpCode(HttpStatus.OK)
     download(@Param('documentId') documentId: string, @Param('pageNum') pageNum: string, @Param('file') file: string) {
-        if (file === 'image') {
+        if (file === 'pageImage') {
             return this.docuvisionService.getPageImage(documentId, pageNum).pipe(
                 flatMap(res => {
                     return this.documentsService.createPageFile(documentId, pageNum, res.data, 'pageImage.jpg').then(() => res);

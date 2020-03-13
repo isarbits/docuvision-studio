@@ -7,21 +7,19 @@ services:
     build:
       context: ../app
     restart: always
-    env_file: ../app/server/.env
+    env_file: ../app/server/.env.example
     environment:
-      - NODE_ENV=development
-      - PORT=8100
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       - DOCUVISION_HOST=${DOCUVISION_HOST}
-      - LOG_LEVELS=debug:none
-      - WORKERS_CLUSER_AUTO_SCALE=true
-      - WORKERS_CLUSER_MAX=10
       - EXTERNAL_WORKERS=true
     network_mode: host
     ports:
       - "8100:8100"
+    depends_on:
+      - es
+      - redis
     volumes:
-      - "${GENERATED_DIR}:/opt/dist/static/public"
+      - "${GENERATED_DIR}:/opt/dist/static"
 
       - ../app/server/dist:/opt/dist
       - ../app/client/build:/client/build
@@ -34,16 +32,16 @@ services:
     build:
       context: ../app
     restart: always
-    env_file: ../app/server/.env
+    env_file: ../app/server/.env.example
     environment:
-      - NODE_ENV=development
-      - PORT=8101
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       - DOCUVISION_HOST=${DOCUVISION_HOST}
-      - WORKER_SERVER_HOST=localhost:8100/v1
       - WORKERS_CLUSER_AUTO_SCALE=true
-      - WORKERS_CLUSER_MAX=5
+      - WORKERS_CLUSER_MAX=10
     network_mode: host
+    depends_on:
+      - es
+      - redis
     volumes:
       - ../app/server/dist:/opt/dist
     command: pm2-runtime /opt/pm2/pm2-config-watch.json --only workers
@@ -59,6 +57,7 @@ services:
       - ELASTICSEARCH_NODE=http://localhost:9200
       - DOCUVISION_HOST=${DOCUVISION_HOST}
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+      - OCR_ENGINE=tesseract
       - ISWIN=${WINDIR}
     volumes:
       - "${INPUT_DIR}:/data"

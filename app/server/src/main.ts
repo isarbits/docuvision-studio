@@ -1,10 +1,11 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import { WsAdapter } from '@nestjs/platform-ws';
+import * as bodyParser from 'body-parser';
 import * as config from 'config';
 import { Request, Response } from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 import { AppModule } from './app.module';
 import { BadRequestExceptionFilter } from './common/filters/bad-request.filter';
@@ -13,11 +14,39 @@ import { LoggingService } from './shared/logging/logging.service';
 
 const log = new LoggingService('App');
 
+const setupProxy = (server: any) => {
+    const options = {
+        target: config.elasticsearch.node,
+        changeOrigin: true,
+        pathRewrite: { '^/search-proxy/': '/' },
+        onProxyReq: (proxyReq, req) => {
+            const { body } = req;
+            if (body) {
+                if (typeof body === 'object') {
+                    proxyReq.write(JSON.stringify(body));
+                } else {
+                    proxyReq.write(body);
+                }
+            }
+        },
+    };
+
+    const yoloCors = (_req: Request, res: Response, next) => {
+        res.set('Access-Control-Allow-Origin', '*');
+        res.set('Access-Control-Allow-Headers', '*');
+        next();
+    };
+
+    server.use('/search-proxy/*', bodyParser.text({ type: 'application/x-ndjson' }), yoloCors, createProxyMiddleware(options));
+};
+
 export const configureApplication = async (app: NestExpressApplication) => {
     app.enableShutdownHooks();
 
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     app.setGlobalPrefix(config.apiPrefix);
+    app.use(bodyParser.json({limit: '50mb'}));
+    setupProxy(app.getHttpAdapter());
 
     const reflector = app.get(Reflector);
 
@@ -57,31 +86,16 @@ export const configureApplication = async (app: NestExpressApplication) => {
 const bootstrap = async () => {
     const start = Date.now();
 
-    const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
-        cors: true,
-        bodyParser: true,
-    });
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), { cors: true });
 
     await configureApplication(app);
-
-    app.connectMicroservice({
-        transport: Transport.TCP,
-        options: {
-            port: config.transportPort,
-            retryAttempts: 5,
-            retryDelay: 3000,
-        },
-    });
-
-    await app.startAllMicroservicesAsync();
 
     await app.listen(config.port);
 
     log.info(
         '\n',
         `  server running ${await app.getUrl()} (${Date.now() - start}ms)\n`,
-        `  transportPort : ${config.transportPort}\n`,
-        `  staticDir     : ${config.paths.staticDir}\n`,
+        `  publicDir     : ${config.paths.publicDir}\n`,
         `  assetsDir     : ${config.paths.assetsDir}\n`,
         `  logLevel      : ${config.logging.logLevel}\n`,
         `  elastic       : ${config.elasticsearch.node}\n`,

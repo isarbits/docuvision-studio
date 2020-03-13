@@ -1,16 +1,13 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Optional } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
+import { Inject, NotFoundException, Optional } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { JobCounts, JobOptions, JobStatusClean, Queue } from 'bull';
 
 import { findLineByLeastSquares } from '../../providers/linear-best-fit';
 import { GeneratorService } from '../../shared/generator/generator.service';
-import { LoggingService } from '../../shared/logging/logging.service';
 import { EventsService } from '../events/events.service';
 
 export const DISABLE_QUEUE_STATS = 'DISABLE_QUEUE_STATS';
-
 const HISTORY_SECONDS = 60 * 60;
 
 interface TrendLine {
@@ -27,7 +24,7 @@ export const RateIntervals = {
 
 export interface QueueInfo {
     current: JobCounts;
-    history: JobCounts[];
+    history?: JobCounts[];
     rates: {
         completed: TrendLine[];
         waiting: TrendLine[];
@@ -40,7 +37,7 @@ export interface QueueInfo {
 export class QueuesService {
     constructor(
         @InjectQueue('processing') private readonly processingQueue: Queue,
-        private readonly loggingService: LoggingService,
+        @InjectQueue('messages') private readonly messagesQueue: Queue,
         private readonly generatorService: GeneratorService,
         private readonly eventsService: EventsService,
         @Optional() @Inject(DISABLE_QUEUE_STATS) private readonly disableQueueStats: boolean = false,
@@ -49,23 +46,30 @@ export class QueuesService {
         this.queueInfo = { current: null, history: [], rates: {} as any };
     }
 
-    publishProcessing<T = any>(name: string, data: T, opts?: JobOptions) {
-        this.loggingService.debug(`[${name}] publish`);
-        return this.processingQueue.add(name, data, { jobId: this.generatorService.uuid(), ...opts });
+    publish<T = any>(queueName: string, name: string, data: T, opts?: JobOptions) {
+        const queue = this.getQueueByName(queueName);
+        return queue.add(name, data, { jobId: this.generatorService.uuid(), ...opts });
     }
 
-    getProcessingJob(jobId: string) {
-        return this.processingQueue.getJob(jobId);
+    getJob(queueName: string, jobId: string) {
+        const queue = this.getQueueByName(queueName);
+        return queue.getJob(jobId);
     }
 
-    empty() {
+    empty(queueName: string) {
+        const queue = this.getQueueByName(queueName);
         return Promise.all<any>([
-            ...['completed', 'wait', 'active', 'delayed', 'failed'].map(name => this.processingQueue.clean(0, name as JobStatusClean)),
-            this.processingQueue.empty(),
+            ...['completed', 'wait', 'active', 'delayed', 'failed'].map(name => queue.clean(0, name as JobStatusClean)),
+            queue.empty(),
         ]);
     }
 
-    getQueueInfo(history = false) {
+    getJobCounts(queueName: string) {
+        const queue = this.getQueueByName(queueName);
+        return queue.getJobCounts();
+    }
+
+    getQueueInfo(history = false): QueueInfo {
         this.computeTrendRates();
         if (history) {
             return this.queueInfo;
@@ -91,8 +95,19 @@ export class QueuesService {
         this.eventsService.emit('queue-stats', this.queueInfo);
     }
 
+    private getQueueByName(queueName: string) {
+        switch (queueName) {
+            case 'processing':
+                return this.processingQueue;
+            case 'messages':
+                return this.messagesQueue;
+            default:
+                throw new NotFoundException('Queue not found.');
+        }
+    }
+
     // TODO: optimize
-    computeTrendRates() {
+    private computeTrendRates() {
         const completedValues = [];
         const waitingValues = [];
         const activeValues = [];

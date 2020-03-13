@@ -15,13 +15,13 @@ interface GetPageImageJobData {
 export class GetPageImageWorker implements WorkerInterface<GetPageImageJobData> {
     readonly jobName = Queues.GET_PAGE_IMAGE;
 
-    constructor(@InjectQueue('processing') readonly processingQueue: Queue, private readonly httpService: HttpService) {
-        this.processingQueue.process(this.jobName, this.work.bind(this));
+    constructor(@InjectQueue('processing') readonly queue: Queue, private readonly httpService: HttpService) {
+        this.queue.process(this.jobName, this.work.bind(this));
     }
 
     async work(job: Job<GetPageImageJobData>) {
         const { documentId, pageNumber } = job.data;
-        const uri = `${workers.serverHost}/documents/${documentId}/pages/${pageNumber}/downloads/image`;
+        const uri = `${workers.serverHost}/documents/${documentId}/pages/${pageNumber}/downloads/pageImage`;
 
         return this.httpService
             .get(uri)

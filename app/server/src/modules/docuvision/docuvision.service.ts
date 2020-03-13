@@ -28,8 +28,6 @@ export class DocuvisionService {
 
         const formData = new FormData();
         formData.append('file', readable, file.originalname);
-        // TODO: remove
-        formData.append('ocrEngine', 'tesseract');
         if (params.ocrEngine) {
             formData.append('ocrEngine', params.ocrEngine);
         }

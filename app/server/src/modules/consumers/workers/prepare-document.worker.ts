@@ -22,12 +22,12 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
     readonly jobName = Queues.PREPARE_DOCUMENT;
 
     constructor(
-        @InjectQueue('processing') readonly processingQueue: Queue,
+        @InjectQueue('processing') readonly queue: Queue,
         private readonly loggingService: LoggingService,
         private readonly docuvisionService: DocuvisionService,
         private readonly queuesService: QueuesService,
     ) {
-        this.processingQueue.process(this.jobName, this.work.bind(this));
+        this.queue.process(this.jobName, this.work.bind(this));
     }
 
     async work(job: Job<PrepareDocumentJobData>) {
@@ -39,14 +39,17 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
         const baseDocument = this.convertJobToDocument(job, document);
 
         const pending = [this.indexDocuent(baseDocument)];
+        console.log(`${baseDocument.document.id}: doc ${document?.pages}`);
 
-        for (const page of document.pages) {
+        for (const page of document?.pages) {
             const pageNumber = page.pageNumber;
 
             pending.push(this.indexPage(baseDocument, pageNumber));
+            console.log(`${baseDocument.document.id}: page ${pageNumber}`);
             pending.push(this.getPageImage(document.id, pageNumber));
+            console.log(`${baseDocument.document.id}: page image ${pageNumber}`);
 
-            const wordCount = page.words.length;
+            const wordCount = page?.words?.length;
             for (let index = 0; index < wordCount; index++) {
                 const word: Docuvision.Word = page.words[index];
 
@@ -55,7 +58,7 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
         }
 
         await Promise.all(pending);
-        this.loggingService.debug(`[job.id] ${baseDocument.id} created ${pending.length} tasks`);
+        this.loggingService.debug(`[${job.id}] ${baseDocument.document.id} created ${pending.length} tasks`);
     }
 
     private convertJobToDocument(job: Job<PrepareDocumentJobData>, document: Docuvision.Document): IndexDocument {
@@ -93,18 +96,18 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
     }
 
     private indexDocuent(baseDocument: IndexDocument) {
-        return this.queuesService.publishProcessing(Queues.INDEX_DOCUMENT, baseDocument);
+        return this.queuesService.publish('processing', Queues.INDEX_DOCUMENT, baseDocument);
     }
 
     private indexPage(baseDocument: IndexDocument, pageNumber: number) {
-        return this.queuesService.publishProcessing(Queues.INDEX_PAGE, { ...baseDocument, pageNumber });
+        return this.queuesService.publish('processing', Queues.INDEX_PAGE, { ...baseDocument, pageNumber });
     }
 
     private getPageImage(documentId: string, pageNumber: number) {
-        return this.queuesService.publishProcessing(Queues.GET_PAGE_IMAGE, { documentId, pageNumber });
+        return this.queuesService.publish('processing', Queues.GET_PAGE_IMAGE, { documentId, pageNumber });
     }
 
     private indexWord(baseDocument: IndexDocument, pageNumber: number, word: Docuvision.Word, index: number) {
-        return this.queuesService.publishProcessing(Queues.INDEX_WORD, { ...baseDocument, pageNumber, word, index });
+        return this.queuesService.publish('processing', Queues.INDEX_WORD, { ...baseDocument, pageNumber, word, index });
     }
 }

@@ -1,9 +1,8 @@
-#root {
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
-        Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@import "../../../styles/colours.scss";
 
+#root {
     .app-header {
-        background: #104200;
+        background: $primary;
         height: 60px;
         box-sizing: border-box;
         padding: 0.5rem 1rem;

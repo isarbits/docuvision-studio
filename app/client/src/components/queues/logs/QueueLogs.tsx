@@ -55,12 +55,11 @@ export class QueueLogs extends React.Component<Props, State> {
                     this.setState(p => ({ logs: [...p.logs, data] }));
                 }
             },
-            (type, err) => {
-                // notify disconnect
-                console.log(type, err);
+            (err, evnt) => {
                 if (typeof this?.props?.onDisconnect === 'function') {
-                    this.props.onDisconnect();
+                    return this.props.onDisconnect();
                 }
+                console.log(err, evnt);
             },
         );
         this.socket.onopen = () => this.setState({ disconnect: false });
@@ -84,11 +83,8 @@ export class QueueLogs extends React.Component<Props, State> {
         if (!logs?.length) {
             return <p>Nothing yet</p>;
         }
-        return logs.map((log, index) => (
-            <p key={`${index}`}>
-                {log.type} {log.message}
-            </p>
-        ));
+
+        return logs.map((log, index) => <p key={`${index}`}>{log.message}</p>);
     };
 
     public render() {

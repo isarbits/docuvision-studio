@@ -3,7 +3,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
-    "declaration": false,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
@@ -12,6 +12,7 @@
       "es2015",
       "esnext"
     ],
+    "composite": true,
     "module": "commonjs",
     "noImplicitAny": false,
     "noLib": false,

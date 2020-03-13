@@ -35,13 +35,13 @@ export class Queues extends React.Component<{}, State> {
                 <h3>Jobs</h3>
 
                 <div className="charts">
+                    {this.state.disconnect && (
+                        <div>
+                            <span style={{ marginRight: '0.5rem' }}>Connection failed</span>
+                            <button data-small onClick={this.emitReconnect}>Reconnect</button>
+                        </div>
+                    )}
                     <div className="flex-row">
-                        {this.state.disconnect && (
-                            <div>
-                                <span style={{ marginRight: '0.5rem' }}>Connection failed</span>
-                                <button onClick={this.emitReconnect}>Reconnect</button>
-                            </div>
-                        )}
                         <select defaultValue={this.state.seconds} onChange={this.changeTime}>
                             <option value={60}>Last minute</option>
                             <option value={60 * 5}>Last 5 minutes</option>

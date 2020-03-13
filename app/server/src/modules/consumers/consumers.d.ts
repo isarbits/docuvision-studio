@@ -4,7 +4,7 @@ import Docuvision from '../docuvision/docuvision.d';
 
 export interface WorkerInterface<T> {
     readonly jobName: string;
-    readonly processingQueue: Queue;
+    readonly queue: Queue;
     readonly work: (job: Job<T>) => Promise<any>;
 }
 
@@ -49,4 +49,17 @@ export interface IndexWord extends IndexObject {
         x1: number;
         y1: number;
     };
+}
+
+export interface AppProc {
+    cpu: number;
+    memory: number;
+}
+
+export interface AppInfo {
+    monit: AppProc;
+    name: string;
+    pid: number;
+    instanceId: number;
+    pm_id: number;
 }

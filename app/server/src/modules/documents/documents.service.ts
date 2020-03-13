@@ -1,4 +1,4 @@
-import { HttpService, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpService, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { elasticsearch, paths } from 'config';
 import { ReadStream } from 'fs';
@@ -41,21 +41,26 @@ export class DocumentsService {
             flatMap(async (response: UploadResponse) => {
                 const documentId = response.data.id;
                 const filePath = params?.filePath;
-                const job = await this.queuesService.publishProcessing(Queues.PREPARE_DOCUMENT, { documentId, start, md5, filePath });
+                const job = await this.queuesService.publish('processing', Queues.PREPARE_DOCUMENT, { documentId, start, md5, filePath });
                 response.data.taskId = job.id;
 
                 return response;
             }),
-            catchError(error => {
-                this.markDocumentFailed(error, md5, Date.now() - start, params.filePath);
-
+            catchError(async error => {
+                await this.markDocumentFailed(error, md5, Date.now() - start, params.filePath);
                 throw error;
             }),
         );
     }
 
     getPageFile(documentId: string, pageNumber: string, file: string): Promise<Buffer | ReadStream> {
-        return this.fileSystemService.getFile(join(paths.assetsDir, documentId, pageNumber, file));
+        return this.fileSystemService.getFile(join(paths.assetsDir, documentId, pageNumber, file))
+            .catch(error => {
+                if (error?.code === 'ENOENT') {
+                    throw new NotFoundException();
+                }
+                throw error;
+            });
     }
 
     createPageFile(documentId: string, pageNumber: string, buffer: Buffer | ReadStream, name: string) {
@@ -81,7 +86,7 @@ export class DocumentsService {
             ret = { error };
         }
 
-        this.queuesService.publishProcessing(Queues.INDEX_DOCUMENT, { ...ret, md5, filePath, duration, failed: true });
+        return this.queuesService.publish('processing', Queues.INDEX_DOCUMENT, { ...ret, md5, filePath, duration, failed: true });
     }
 
     private deleteDocumentPages(documentId: string): Observable<AxiosResponse<{}>> {

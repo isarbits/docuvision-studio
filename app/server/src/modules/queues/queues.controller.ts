@@ -9,23 +9,23 @@ export class QueuesController {
     constructor(private readonly queuesService: QueuesService) {}
 
     @Get(':queueName')
-    queueInfo(@Param('history') withHist: string) {
-        return this.queuesService.getQueueInfo(!!withHist);
+    getJobCounts(@Param('queueName') queueName: string) {
+        return this.queuesService.getJobCounts(queueName);
     }
 
     @Post(':queueName/jobs')
-    publishQueueJob(/*@Param('queueName') queueName: string, */ @Body() params: { jobName: string; data: any }) {
-        return this.queuesService.publishProcessing(params.jobName, params.data);
+    publishQueueJob(@Param('queueName') queueName: string, @Body() params: { jobName: string; data: any }) {
+        return this.queuesService.publish(queueName, params.jobName, params.data);
     }
 
     @Get(':queueName/jobs/:jobId')
-    getQueueJob(@Param('jobId') jobId: string) {
-        return this.queuesService.getProcessingJob(jobId);
+    getQueueJob(@Param('queueName') queueName: string, @Param('jobId') jobId: string) {
+        return this.queuesService.getJob(queueName, jobId);
     }
 
     @Delete(':queueName')
     @HttpCode(HttpStatus.NO_CONTENT)
-    empty() {
-        return this.queuesService.empty();
+    empty(@Param('queueName') queueName: string) {
+        return this.queuesService.empty(queueName);
     }
 }

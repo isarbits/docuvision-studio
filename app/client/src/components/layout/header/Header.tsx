@@ -7,7 +7,7 @@ export class Header extends React.Component<{}> {
     render() {
         return (
             <>
-                <header className="app-header">
+                <header className="app-header app-grid-header">
                     <div className="header-content">
                         <span>Docuvision Studio</span>
                         <a

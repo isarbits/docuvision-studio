@@ -1,0 +1,157 @@
+// Colours
+$black: hsl(0, 0%, 4%);
+$black-bis: hsl(0, 0%, 7%);
+$black-ter: hsl(0, 0%, 14%);
+
+$grey-darker: hsl(0, 0%, 21%);
+$grey-dark: hsl(0, 0%, 29%);
+$grey: hsl(180, 4%, 45%);
+$grey-light: hsl(203, 23%, 82%);
+$grey-lighter: hsl(204, 33%, 88%);
+
+$white-ter: hsl(204, 33%, 94%);
+$white-bis: hsl(204, 33%, 98%);
+$white: hsl(0, 0%, 100%);
+
+$orange: hsl(14, 100%, 53%);
+$yellow: hsl(48, 100%, 67%);
+$green: hsl(141, 71%, 48%);
+$turquoise: hsl(171, 100%, 38%);
+$cyan: hsl(197, 100%, 44%);
+$blue: hsl(204, 35%, 42%);
+$purple: hsl(271, 100%, 71%);
+$red: hsl(348, 100%, 61%);
+
+$orange-light: lighten($orange, 10%);
+$yellow-light: lighten($yellow, 10%);
+$green-light: lighten($green, 10%);
+$turquoise-light: lighten($turquoise, 10%);
+$cyan-light: lighten($cyan, 10%);
+$blue-light: lighten($blue, 10%);
+$purple-light: lighten($purple, 10%);
+$red-light: lighten($red, 10%);
+
+$orange-dark: darken($orange, 10%);
+$yellow-dark: darken($yellow, 10%);
+$green-dark: darken($green, 10%);
+$turquoise-dark: darken($turquoise, 10%);
+$cyan-dark: darken($cyan, 10%);
+$blue-dark: darken($blue, 10%);
+$purple-dark: darken($purple, 10%);
+$red-dark: darken($red, 10%);
+
+$orange-darker: darken($orange, 20%);
+$yellow-darker: darken($yellow, 20%);
+$green-darker: darken($green, 20%);
+$turquoise-darker: darken($turquoise, 20%);
+$cyan-darker: darken($cyan, 20%);
+$blue-darker: darken($blue, 20%);
+$purple-darker: darken($purple, 20%);
+$red-darker: darken($red, 20%);
+
+$shadow: rgba(0, 0, 0, 0.25);
+
+$primary: darken($green-darker, 10%);
+$accent: #0b6aff;
+
+// Array of name, colour, and text colour (for background)
+$allColours: (
+    ("black", $black, #fff),
+    ("black-bis", $black-bis, #fff),
+    ("black-ter", $black-ter, #fff),
+    ("grey-darker", $grey-darker, #fff),
+    ("grey-dark", $grey-dark, #fff),
+    ("grey", $grey, #fff),
+    ("grey-light", $grey-light, #000),
+    ("grey-lighter", $grey-lighter, #000),
+    ("white-ter", $white-ter, #000),
+    ("white-bis", $white-bis, #000),
+    ("white", $white, #000),
+    ("orange", $orange, #000),
+    ("yellow", $yellow, #000),
+    ("green", $green, #000),
+    ("turquoise", $turquoise, #000),
+    ("cyan", $cyan, #000),
+    ("blue", $blue, #000),
+    ("purple", $purple, #000),
+    ("red", $red, #000),
+    ("orange-light", $orange-light, #000),
+    ("yellow-light", $yellow-light, #000),
+    ("green-light", $green-light, #000),
+    ("turquoise-light", $turquoise-light, #000),
+    ("cyan-light", $cyan-light, #000),
+    ("blue-light", $blue-light, #000),
+    ("purple-light", $purple-light, #000),
+    ("red-light", $red-light, #000),
+    ("orange-dark", $orange-dark, #fff),
+    ("yellow-dark", $yellow-dark, #fff),
+    ("green-dark", $green-dark, #fff),
+    ("turquoise-dark", $turquoise-dark, #fff),
+    ("cyan-dark", $cyan-dark, #fff),
+    ("blue-dark", $blue-dark, #fff),
+    ("purple-dark", $purple-dark, #fff),
+    ("red-dark", $red-dark, #fff),
+    ("orange-darker", $orange-darker, #fff),
+    ("yellow-darker", $yellow-darker, #fff),
+    ("green-darker", $green-darker, #fff),
+    ("turquoise-darker", $turquoise-darker, #fff),
+    ("cyan-darker", $cyan-darker, #fff),
+    ("blue-darker", $blue-darker, #fff),
+    ("purple-darker", $purple-darker, #fff),
+    ("red-darker", $red-darker, #fff),
+    ("shadow", $shadow, #000),
+    ("primary", $primary, #fff),
+    ("accent", $accent, #fff),
+    ("danger", $orange-dark, #fff),
+    ("warning", $yellow-darker, #000),
+    ("info", $cyan-dark, #fff)
+);
+
+// fix for "is-colour" only being available through stylesheets
+// #{nth($colour, 1)} - array 1, 2, 3 (1 indexed)
+@each $colour in $allColours {
+    .bg-#{nth($colour, 1)} {
+        background-color: #{nth($colour, 2)};
+        color: #{nth($colour, 3)};
+    }
+
+    .fg-#{nth($colour, 1)} {
+        color: #{nth($colour, 2)};
+    }
+
+    .border-#{nth($colour, 1)} {
+        border: 1px solid #{nth($colour, 2)};
+    }
+
+    .border-y-#{nth($colour, 1)} {
+        border-top: 1px solid #{nth($colour, 2)};
+        border-bottom: 1px solid #{nth($colour, 2)};
+    }
+
+    .border-x-#{nth($colour, 1)} {
+        border-right: 1px solid #{nth($colour, 2)};
+        border-left: 1px solid #{nth($colour, 2)};
+    }
+
+    .border-r-#{nth($colour, 1)} {
+        border-right: 1px solid #{nth($colour, 2)};
+    }
+
+    .border-l-#{nth($colour, 1)} {
+        border-left: 1px solid #{nth($colour, 2)};
+    }
+
+    .border-t-#{nth($colour, 1)} {
+        border-top: 1px solid #{nth($colour, 2)};
+    }
+
+    .border-b-#{nth($colour, 1)} {
+        border-bottom: 1px solid #{nth($colour, 2)};
+    }
+
+    button.#{nth($colour, 1)} {
+        background-color: #{nth($colour, 2)};
+        color: #{nth($colour, 3)};
+        border: 2px solid #{nth($colour, 2)};
+    }
+}
