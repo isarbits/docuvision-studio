@@ -34,6 +34,9 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
 
     async work(job: Job<PrepareDocumentJobData>) {
         const { data } = await this.docuvisionService.pollForCompletion(job.data.documentId);
+        if (data.errors) {
+            return this.queuesService.publish('processing', Queues.INDEX_DOCUMENT, { ...data, failed: true });
+        }
         return this.enqueNext(job, data);
     }
 
@@ -42,8 +45,7 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
 
         const pending = [this.indexDocuent(baseDocument)];
 
-        for (let i = 0; i < document.pageCount; ++i) {
-            const page = document.pages[i];
+        for (const page of document.pages) {
             const pageNumber = page.pageNumber;
 
             pending.push(this.indexPage(baseDocument, pageNumber));
