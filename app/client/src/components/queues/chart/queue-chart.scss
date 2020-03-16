@@ -1,3 +1,5 @@
+@import "styles/colours.scss";
+
 #root {
     .queue-chart {
         display: flex;
@@ -8,7 +10,13 @@
         }
 
         .ct-chart .ct-chart-line {
-            background-color: rgba(0, 60, 100, 0.2);
+            background-color: rgba($blue-darker, 0.2);
+            border-radius: 4px;
+
+            .ct-line {
+                stroke-width: 2px;
+                stroke: $blue;
+            }
         }
 
         .flex-row {

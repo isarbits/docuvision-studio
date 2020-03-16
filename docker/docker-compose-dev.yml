@@ -3,7 +3,7 @@ version: "3"
 services:
   app:
     container_name: ds_dev_app
-    image: isarbits/docuvision-studio-app:dev
+    image: isarbits/docuvision-studio-app
     build:
       context: ../app
     restart: always
@@ -12,6 +12,7 @@ services:
       - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       - DOCUVISION_HOST=${DOCUVISION_HOST}
       - EXTERNAL_WORKERS=true
+      - OCR_ENGINE=${OCR_ENGINE}
     network_mode: host
     ports:
       - "8100:8100"
@@ -28,7 +29,7 @@ services:
 
   workers:
     container_name: ds_dev_workers
-    image: isarbits/docuvision-studio-app:dev
+    image: isarbits/docuvision-studio-app
     build:
       context: ../app
     restart: always
@@ -38,17 +39,19 @@ services:
       - DOCUVISION_HOST=${DOCUVISION_HOST}
       - WORKERS_CLUSER_AUTO_SCALE=true
       - WORKERS_CLUSER_MAX=10
+      - OCR_ENGINE=${OCR_ENGINE}
     network_mode: host
     depends_on:
       - es
       - redis
     volumes:
+      - ./worker-static:/opt/dist/static
       - ../app/server/dist:/opt/dist
     command: pm2-runtime /opt/pm2/pm2-config-watch.json --only workers
 
   indexer:
     container_name: ds_dev_indexer
-    image: isarbits/docuvision-studio-indexer:dev
+    image: isarbits/docuvision-studio-indexer
     build:
       context: ../indexer-cli
     restart: always

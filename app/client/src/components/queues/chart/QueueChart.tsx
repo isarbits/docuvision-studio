@@ -48,26 +48,11 @@ interface Props {
     historySeconds?: number;
     lineOptions?: ILineChartOptions;
     pieOptions?: IPieChartOptions;
-    onDisconnect?: () => void;
 }
 
 export class QueueChart extends React.Component<Props, State> {
     public state: State = {};
-
     private socket: WebSocket = null as any;
-
-    componentDidMount() {
-        EventBus.on('queue-reconnect', 'QueueChart:componentDidMount', () =>
-            this.setupSubscriber(),
-        );
-        this.setupSubscriber();
-    }
-
-    componentWillUnmount() {
-        EventBus.off('queue-reconnect', 'QueueChart:componentDidMount');
-        this.socket && this.socket.close();
-    }
-
     private stateToIndex = {
         active: 0,
         completed: 1,
@@ -75,12 +60,38 @@ export class QueueChart extends React.Component<Props, State> {
         delayed: 3,
         waiting: 4,
     };
-
     private historyToIndex = {
         3600: 0,
         1800: 1,
         300: 2,
         60: 3,
+    };
+
+    constructor(props, state) {
+        super(props, state);
+
+        this.setupSubscriber = this.setupSubscriber.bind(this);
+    }
+
+    componentDidMount() {
+        EventBus.on('queue-reconnect', this.setupSubscriber);
+        this.setupSubscriber();
+    }
+
+    componentWillUnmount() {
+        EventBus.off('queue-reconnect', this.setupSubscriber);
+        this.socket && this.socket.close();
+    }
+
+    private setupSubscriber = () => {
+        this.socket && this.socket.close();
+        this.socket = subscribe(
+            'queue-stats',
+            data => this.convertToChart(data),
+            (err, evnt) => {
+                EventBus.emit('queue-disconnect', { err, evnt });
+            },
+        );
     };
 
     // private addRateToChart = (rate): number[] => {
@@ -154,20 +165,6 @@ export class QueueChart extends React.Component<Props, State> {
         ) as string[];
 
         return sorted.map((label, i) => <span key={i}>{label}</span>);
-    };
-
-    private setupSubscriber = () => {
-        this.socket && this.socket.close();
-        this.socket = subscribe(
-            'queue-stats',
-            data => this.convertToChart(data),
-            (err, evnt) => {
-                if (typeof this?.props?.onDisconnect === 'function') {
-                    return this.props.onDisconnect();
-                }
-                console.log(err, evnt);
-            },
-        );
     };
 
     public render() {

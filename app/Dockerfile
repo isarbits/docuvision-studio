@@ -16,6 +16,7 @@ RUN npm install
 
 COPY client .
 COPY --from=dist . server
+COPY client/.env.example .env
 
 RUN npm run build
 
@@ -35,8 +36,8 @@ WORKDIR /opt
 
 COPY --from=dist dist /opt/dist
 COPY --from=dist package.json /opt/package.json
-COPY --from=dist config/pm2-config*.json /opt/pm2/
+COPY --from=dist config/pm2*.json /opt/pm2/
 COPY --from=client build /opt/dist/app
 COPY --from=node_modules node_modules /opt/node_modules
 
-CMD "pm2-runtime /opt/pm2/pm2-config.json"
+CMD ["pm2-runtime", "/opt/pm2/pm2-config.json"]

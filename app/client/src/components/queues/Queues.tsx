@@ -15,6 +15,20 @@ export class Queues extends React.Component<{}, State> {
         disconnect: false,
     };
 
+    constructor(props, state) {
+        super(props, state);
+
+        this.disconnected = this.disconnected.bind(this);
+    }
+
+    componentDidMount() {
+        EventBus.on('queue-disconnect', this.disconnected);
+    }
+
+    componentWillUnmount() {
+        EventBus.off('queue-disconnect', this.disconnected);
+    }
+
     private changeTime = (evnt: React.SyntheticEvent<HTMLSelectElement>) => {
         const seconds = Number(evnt?.currentTarget?.value) ?? 60;
         this.setState({ seconds });
@@ -25,8 +39,8 @@ export class Queues extends React.Component<{}, State> {
     };
 
     private emitReconnect = () => {
-        EventBus.emit('queue-reconnect');
         this.setState({ disconnect: false });
+        EventBus.emit('queue-reconnect');
     };
 
     public render() {
@@ -36,9 +50,11 @@ export class Queues extends React.Component<{}, State> {
 
                 <div className="charts">
                     {this.state.disconnect && (
-                        <div>
+                        <div className="mb-2">
                             <span style={{ marginRight: '0.5rem' }}>Connection failed</span>
-                            <button data-small onClick={this.emitReconnect}>Reconnect</button>
+                            <button data-small onClick={this.emitReconnect}>
+                                Reconnect
+                            </button>
                         </div>
                     )}
                     <div className="flex-row">
@@ -52,13 +68,9 @@ export class Queues extends React.Component<{}, State> {
                     <br />
                     <br />
 
-                    <QueueChart
-                        label="Active Jobs:"
-                        historySeconds={this.state.seconds}
-                        onDisconnect={this.disconnected}
-                    />
+                    <QueueChart label="Active Jobs:" historySeconds={this.state.seconds} />
                 </div>
-                <QueueLogs onDisconnect={this.disconnected} />
+                <QueueLogs />
             </section>
         );
     }

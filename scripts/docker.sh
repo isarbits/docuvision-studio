@@ -8,7 +8,7 @@ actions:
   down
   build
   push
-  deploy (same as build and push)
+  deploy (same as dev build and dev push)
 options:
   dev  use docker-compose-dev"
 
@@ -19,7 +19,7 @@ while [ -n "$1" ] && [ -z "$done" ]; do
     down) act="down --remove-orphans";;
     build) act="build --force-rm"; dev=true;;
     push) act=push; dev=true;;
-    deploy) act=deploy; dev=true;;
+    deploy) act=deploy;;
     dev) dev=true;;
     -h) echo "$usage" && exit 0;;
     --) shift; done=true; break;;
@@ -39,7 +39,7 @@ if [ -n "$dev" ]; then
 fi
 
 # echo "docker-compose ${args[@]} $act"
-if [ -n "$deploy" ]; then
+if [ "$act" == "deploy" ]; then
   docker-compose -f docker-compose-dev.yml build && \
   docker-compose -f docker-compose-dev.yml push
 else

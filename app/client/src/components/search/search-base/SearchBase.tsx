@@ -1,4 +1,10 @@
-import { DataSearch, MultiList, ReactiveBase, ReactiveList, SelectedFilters } from '@appbaseio/reactivesearch';
+import {
+    DataSearch,
+    MultiList,
+    ReactiveBase,
+    ReactiveList,
+    SelectedFilters,
+} from '@appbaseio/reactivesearch';
 import React from 'react';
 import { elasticHost } from '../../../config';
 
@@ -40,10 +46,12 @@ export class SearchBase extends React.Component<Props, any> {
                     app="docuvision_page"
                     url={elasticHost}
                     className="page-search-content-container flex"
-                    transformRequest={(e) => {
+                    transformRequest={e => {
                         if (typeof this?.props?.onQuery === 'function') {
                             // get the ndjson body and replace page with word index
-                            const query = e.body.split('\n')[1].replace(/"page\.words\.text"/g, '"word.text"');
+                            const query = e.body
+                                .split('\n')[1]
+                                .replace(/"page\.words\.text"/g, '"word.text"');
                             this.props.onQuery(JSON.parse(query));
                         }
                         return e;

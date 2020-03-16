@@ -11,7 +11,6 @@
     "@types/react-dom": "^16.9.0",
     "chartist": "^0.11.4",
     "d3": "^5.15.0",
-    "http-proxy-middleware": "^1.0.0",
     "node-sass": "^4.13.1",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
@@ -29,7 +28,6 @@
     "watch": "nodemon",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "format": "prettier --write -l \"./src/**/*.{ts,tsx,json,scss}\" && eslint --fix src/ --ext .ts,.tsx",
     "cold": "sed -i \"s:require.resolve('react-dev-utils/webpackHotDevClient'):null:\" node_modules/react-scripts/config/webpack.config.js"
   },

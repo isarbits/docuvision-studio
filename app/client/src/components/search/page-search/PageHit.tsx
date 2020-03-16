@@ -1,8 +1,8 @@
 import { ResultList } from '@appbaseio/reactivesearch';
 import React from 'react';
-import { baseUrl } from '../../../../config';
-import { Modal } from '../../../shared/modal/Modal';
-import { Hit, Search } from '../../../../interfaces/index.d';
+import { baseUrl } from '../../../config';
+import { Modal } from '../../shared/modal/Modal';
+import { Hit, Search } from '../../../interfaces/index.d';
 
 interface Props {
     page: Hit<Search.IndexPage>;

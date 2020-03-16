@@ -1,6 +1,7 @@
 import { getQueueToken } from '@nestjs/bull';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { WsAdapter } from '@nestjs/platform-ws';
 import { Queue } from 'bull';
 import { workers } from 'config';
 
@@ -14,6 +15,9 @@ const boostrap = async () => {
     const procTitle = process.env.INSTANCE_ID ? `${process.env.name}${process.env.INSTANCE_ID}` : 'standalone';
 
     const app = await NestFactory.create<NestExpressApplication>(consumerModule);
+
+    app.useWebSocketAdapter(new WsAdapter(app));
+
     await app.listen(workers.cluster.autoScale ? workers.cluster.port : null);
 
     loggingService.server(

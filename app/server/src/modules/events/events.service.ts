@@ -21,7 +21,7 @@ interface ClientSubscriptions {
 }
 
 @Injectable()
-@WebSocketGateway(null, { transports: ['websocket'] })
+@WebSocketGateway(/*null, { transports: ['websocket'] }*/)
 export class EventsService implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private readonly server: Server;
 

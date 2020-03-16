@@ -41,7 +41,16 @@ export class DocumentsService {
             flatMap(async (response: UploadResponse) => {
                 const documentId = response.data.id;
                 const filePath = params?.filePath;
-                const job = await this.queuesService.publish('processing', Queues.PREPARE_DOCUMENT, { documentId, start, md5, filePath });
+                const { buffer, ...rest } = file;
+                void buffer;
+
+                const job = await this.queuesService.publish('processing', Queues.PREPARE_DOCUMENT, {
+                    documentId,
+                    file: rest,
+                    start,
+                    md5,
+                    filePath,
+                });
                 response.data.taskId = job.id;
 
                 return response;
@@ -54,13 +63,12 @@ export class DocumentsService {
     }
 
     getPageFile(documentId: string, pageNumber: string, file: string): Promise<Buffer | ReadStream> {
-        return this.fileSystemService.getFile(join(paths.assetsDir, documentId, pageNumber, file))
-            .catch(error => {
-                if (error?.code === 'ENOENT') {
-                    throw new NotFoundException();
-                }
-                throw error;
-            });
+        return this.fileSystemService.getFile(join(paths.assetsDir, documentId, pageNumber, file)).catch(error => {
+            if (error?.code === 'ENOENT') {
+                throw new NotFoundException();
+            }
+            throw error;
+        });
     }
 
     createPageFile(documentId: string, pageNumber: string, buffer: Buffer | ReadStream, name: string) {

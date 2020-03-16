@@ -92,15 +92,13 @@ export class LoggingService {
             return false;
         }
 
-        // const { humanFormat, timestamp } = this.formatDate();
-        const { timestamp } = this.formatDate();
+        const { humanFormat, timestamp } = this.formatDate();
         const logType = console[type] || console.log;
 
         const sourceCol = s => `\x1b[1;36m${s}\x1b[0;0m`;
 
         if (source) {
-            // logType(`${humanFormat} ${timestamp} [${sourceCol(source)}]`, colourize(type.toUpperCase()), ...msg);
-            logType(`${timestamp} [${sourceCol(source)}]`, colourize(type.toUpperCase()), ...msg);
+            logType(`${humanFormat} [${sourceCol(source)}]`, colourize(type.toUpperCase()), ...msg);
         } else {
             logType(timestamp, colourize(type.toUpperCase()), ...msg);
         }

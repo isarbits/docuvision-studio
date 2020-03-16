@@ -1,5 +1,6 @@
 import { Job, JobId, Queue } from 'bull';
 
+import { File } from '../../interfaces';
 import Docuvision from '../docuvision/docuvision.d';
 
 export interface WorkerInterface<T> {
@@ -19,12 +20,13 @@ export interface IndexObject {
     error: any;
     processingTime: number;
     upload?: {
-        path: string;
-        folder: string;
-        filename: string;
-        extension: string;
-        size: number;
-        md5: string;
+        file?: Omit<File, 'buffer'>;
+        path?: string;
+        folder?: string;
+        filename?: string;
+        extension?: string;
+        size?: number;
+        md5?: string;
         folderTree?: Tree;
         folderParts?: string[];
     };

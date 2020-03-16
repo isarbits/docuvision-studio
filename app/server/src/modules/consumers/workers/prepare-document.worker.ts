@@ -4,6 +4,7 @@ import { statSync } from 'fs';
 import { basename, dirname, extname, sep } from 'path';
 
 import { Queues } from '../../../common/constants/queues';
+import { File } from '../../../interfaces';
 import { LoggingService } from '../../../shared/logging/logging.service';
 import Docuvision from '../../docuvision/docuvision.d';
 import { DocuvisionService } from '../../docuvision/docuvision.service';
@@ -14,6 +15,7 @@ interface PrepareDocumentJobData {
     documentId: string;
     start: number;
     md5: string;
+    file: Omit<File, 'buffer'>;
     filePath?: string;
 }
 
@@ -41,7 +43,8 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
         const pending = [this.indexDocuent(baseDocument)];
         console.log(`${baseDocument.document.id}: doc ${document?.pages}`);
 
-        for (const page of document?.pages) {
+        for (let i = 0; i < document.pageCount; ++i) {
+            const page = document.pages[i];
             const pageNumber = page.pageNumber;
 
             pending.push(this.indexPage(baseDocument, pageNumber));
@@ -58,6 +61,7 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
         }
 
         await Promise.all(pending);
+
         this.loggingService.debug(`[${job.id}] ${baseDocument.document.id} created ${pending.length} tasks`);
     }
 
@@ -71,10 +75,15 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
             error: null,
             document: null,
             processingTime: Date.now() - job.processedOn,
+            upload: {
+                file: job.data.file,
+                md5,
+            },
         };
 
         if (filePath) {
             esDocument.upload = {
+                ...esDocument.upload,
                 path: filePath,
                 folder: dirname(filePath),
                 filename: basename(filePath),
@@ -82,7 +91,6 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
                 size: statSync(filePath).size,
                 folderParts: filePath.split(sep).filter(Boolean),
                 // folderTree: buildTreeFromPath(filePath),
-                md5,
             };
         }
 

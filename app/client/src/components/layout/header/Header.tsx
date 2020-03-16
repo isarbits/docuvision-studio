@@ -21,10 +21,10 @@ export class Header extends React.Component<{}> {
                     </div>
                     <div className="links">
                         <nav>
-                            <NavLink exact={true} to="/">
+                            {/*<NavLink exact={true} to="/">
                                 Home
-                            </NavLink>
-                            <NavLink exact={true} to="/search">
+                            </NavLink>*/}
+                            <NavLink exact={true} to="/">
                                 Search
                             </NavLink>
                             <NavLink exact={true} to="/queues">

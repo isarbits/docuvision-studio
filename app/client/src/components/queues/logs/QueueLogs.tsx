@@ -22,18 +22,19 @@ interface Props {
 }
 
 export class QueueLogs extends React.Component<Props, State> {
-    public state: State = {
-        disconnect: false,
-        logs: [],
-    };
-
+    public state: State = { disconnect: false, logs: [] };
     private logRef = React.createRef<HTMLDivElement>();
     private dummyRef = React.createRef<HTMLDivElement>();
-
     private socket: WebSocket = null as any;
 
+    constructor(props, state) {
+        super(props, state);
+
+        this.setupSubscriber = this.setupSubscriber.bind(this);
+    }
+
     componentDidMount() {
-        EventBus.on('queue-reconnect', 'QueueLogs:componentDidMount', () => this.setupSubscriber());
+        EventBus.on('queue-reconnect', this.setupSubscriber);
         this.setupSubscriber();
     }
 
@@ -42,7 +43,7 @@ export class QueueLogs extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
-        EventBus.off('queue-reconnect', 'QueueLogs:componentDidMount');
+        EventBus.off('queue-reconnect', this.setupSubscriber);
         this.socket && this.socket.close();
     }
 
@@ -56,10 +57,7 @@ export class QueueLogs extends React.Component<Props, State> {
                 }
             },
             (err, evnt) => {
-                if (typeof this?.props?.onDisconnect === 'function') {
-                    return this.props.onDisconnect();
-                }
-                console.log(err, evnt);
+                EventBus.emit('queue-disconnect', { err, evnt });
             },
         );
         this.socket.onopen = () => this.setState({ disconnect: false });
@@ -72,7 +70,7 @@ export class QueueLogs extends React.Component<Props, State> {
             return;
         }
 
-        if (div.scrollTop >= div.scrollHeight - div.offsetHeight - 200) {
+        if (div.scrollTop >= div.scrollHeight - div.offsetHeight - 180) {
             dummy.scrollIntoView();
         }
     };

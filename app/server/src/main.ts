@@ -30,30 +30,27 @@ const setupProxy = (server: any) => {
             }
         },
     };
-
-    const yoloCors = (_req: Request, res: Response, next) => {
+    const proxyCors = (_req: Request, res: Response, next) => {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Headers', '*');
         next();
     };
 
-    server.use('/search-proxy/*', bodyParser.text({ type: 'application/x-ndjson' }), yoloCors, createProxyMiddleware(options));
+    server.use('/search-proxy/*', bodyParser.text({ type: 'application/x-ndjson' }), proxyCors, createProxyMiddleware(options));
 };
 
 export const configureApplication = async (app: NestExpressApplication) => {
     app.enableShutdownHooks();
 
+    app.useWebSocketAdapter(new WsAdapter(app));
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     app.setGlobalPrefix(config.apiPrefix);
-    app.use(bodyParser.json({limit: '50mb'}));
+    app.use(bodyParser.json({ limit: '50mb' }));
     setupProxy(app.getHttpAdapter());
 
     const reflector = app.get(Reflector);
 
-    app.useWebSocketAdapter(new WsAdapter(app));
-
     app.useGlobalFilters(new BadRequestExceptionFilter(reflector));
-    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
     app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector), new ErrorsInterceptor());
     app.useGlobalPipes(
         new ValidationPipe({
