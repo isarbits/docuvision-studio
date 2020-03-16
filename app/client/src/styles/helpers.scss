@@ -1,0 +1,57 @@
+.fill-height {
+    height: 100%;
+    flex-grow: 1;
+}
+
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+// flex
+.flex,
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-shrink {
+    flex-shrink: 1;
+}
+
+.flex-grow {
+    flex: 1;
+}
+
+.flex-justify-space-between {
+    display: flex;
+    justify-content: space-between;
+}
+.flex-justify-space-around {
+    display: flex;
+    justify-content: space-around;
+}
+
+.flex-justify-center {
+    display: flex;
+    justify-content: center;
+}
+
+.flex-align-center {
+    display: flex;
+    align-items: center;
+}

@@ -1,12 +1,8 @@
 import * as chokidar from 'chokidar';
 import * as fs from 'fs';
-import { docuvision, elastic } from 'config';
 import { indexAllFiles } from './index-files';
 
-// folders.foreach(...watch)
 export const watchFolderAndIndex = (folder: string) => {
-    console.log(`Docuvision: ${docuvision.host}`);
-    console.log(`Elastic: ${elastic.node}`);
     if (process.env.ISWIN) {
         console.warn('Polling enabled on windows - may result in performance issues');
     }
@@ -19,7 +15,6 @@ export const watchFolderAndIndex = (folder: string) => {
 
     const fileQueue = [];
     let working = false;
-    let pingOnce = true;
     let debounceTimer;
 
     const getDebounced = () =>
@@ -27,6 +22,8 @@ export const watchFolderAndIndex = (folder: string) => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => res(clearTimeout(debounceTimer)), 100);
         });
+
+    const isFile = filename => fs.existsSync(filename) && fs.statSync(filename).isFile();
 
     const fsChangeHandler = async (_op: string, file: string) => {
         if (file) {
@@ -37,16 +34,13 @@ export const watchFolderAndIndex = (folder: string) => {
 
         if (!working) {
             working = true;
-            // osx emits "rename" _op event on every file change (delete, create, rename)
-            // so as a workaround, we simply queue every operation, remove dupes, and assert the file exists
-            const pending = [...new Set(fileQueue.splice(0, fileQueue.length))].filter(
-                filename => fs.existsSync(filename) && fs.statSync(filename).isFile(),
-            );
+
+            const pending = [...new Set(fileQueue.splice(0, fileQueue.length))].filter(isFile);
+
             if (pending.length) {
-                // TODO: upload to api
-                await indexAllFiles(pending, pingOnce);
-                pingOnce = false;
+                await indexAllFiles(pending);
             }
+
             working = false;
 
             // if events were fired while we were processing, just re-fire

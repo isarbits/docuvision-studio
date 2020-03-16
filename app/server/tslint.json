@@ -1,61 +1,35 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "extends": ["tslint:recommended"],
   "jsRules": {
     "no-unused-expression": true
   },
   "rules": {
-    "array-type": [
-      false
-    ],
+    "array-type": [false],
     "arrow-parens": false,
     "blank-line-between-methods": true,
     "curly": false,
     "eofline": true,
     "indent": false,
     "interface-name": false,
-    "max-classes-per-file": [
-      false,
-      1
-    ],
-    "max-line-length": [
-      true,
-      300
-    ],
-    "member-access": [
-      false
-    ],
-    "member-ordering": [
-      false
-    ],
-    "no-console": [
-      true,
-      "log",
-      "error"
-    ],
+    "max-classes-per-file": [false, 1],
+    "max-line-length": [true, 300],
+    "member-access": [false],
+    "member-ordering": [false],
+    "no-console": [true, "log", "error"],
     "no-empty": false,
     "no-empty-interface": false,
     "no-focused-test": true,
     "no-unused-expression": false,
     "object-literal-key-quotes": false,
     "object-literal-sort-keys": false,
-    "one-line": [
-      false
-    ],
-    "one-variable-per-declaration": [
-      false
-    ],
+    "one-line": [false],
+    "one-variable-per-declaration": [false],
     "ordered-imports": [
       true,
       {
         "grouped-imports": true,
-        "groups": [
-          "^@",
-          "^\\w",
-          "^\\.+"
-        ]
+        "groups": ["^@", "^\\w", "^\\.+"]
       }
     ],
     "prefer-const": [
@@ -65,15 +39,9 @@
       }
     ],
     "quotemark": false,
-    "semicolon": [
-      true,
-      "always",
-      "ignore-bound-class-methods"
-    ],
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
     "trailing-comma": false,
-    "variable-name": [
-      false
-    ]
+    "variable-name": [false]
   },
   "rulesDirectory": []
 }

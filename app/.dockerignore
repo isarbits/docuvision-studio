@@ -1,6 +1,7 @@
 **/.git
 **/dist
 **/build
+**/.env
 **/node_modules
 **/.npm-scripts
 **/.vscode

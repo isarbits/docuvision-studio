@@ -13,20 +13,19 @@
         "index": "node dist/src/index.js index",
         "apikey": "node dist/src/index.js apikey",
         "docker": "cd docker/dev && docker-compose up -d --remove-orphans --build",
-        "format": "eslint --fix src/ --ext .ts && prettier --write -l \"src/**/*.ts\"",
+        "format": "prettier --write -l \"src/**/*.ts\" && eslint --fix src/ --ext .ts",
         "preinstall": "node .npm-scripts/preinstall.js"
     },
     "dependencies": {
-        "@elastic/elasticsearch": "^7.6.0",
         "chokidar": "^3.3.1",
         "config": "^3.2.5",
         "dotenv": "^8.2.0",
         "superagent": "^5.2.2"
     },
     "devDependencies": {
-        "@types/node": "^13.7.4",
-        "@typescript-eslint/eslint-plugin": "^2.19.0",
-        "@typescript-eslint/parser": "^2.19.0",
+        "@types/node": "^13.9.0",
+        "@typescript-eslint/eslint-plugin": "^2.23.0",
+        "@typescript-eslint/parser": "^2.23.0",
         "eslint": "^6.8.0",
         "nodemon": "^2.0.2",
         "prettier": "^1.18.2",

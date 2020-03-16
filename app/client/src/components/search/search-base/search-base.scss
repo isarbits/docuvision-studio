@@ -1,0 +1,24 @@
+#root .page-search-content-container {
+    .relative {
+        position: relative;
+    }
+
+    .reactive-list {
+        overflow-y: auto;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .multi-list ul li {
+        padding-right: 0.5rem;
+
+        label span span {
+            max-width: 220px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+}

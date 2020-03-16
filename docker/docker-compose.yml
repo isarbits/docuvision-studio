@@ -17,7 +17,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=8100
-      - ELASTICSEARCH_NODE=http://ds_elastic:9200
+      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+    network_mode: host
     ports:
       - "8100:8100"
     volumes:
@@ -30,14 +31,14 @@ services:
     network_mode: host
     environment:
       - NODE_ENV=production
-      - ELASTICSEARCH_NODE=http://localhost:9200
-      - DOCUVISION_HOST=${DOCUVISION_HOST}
-      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
       # - ELASTICSEARCH_INDEX_WORDS=true
       - ISWIN=${WINDIR}
     volumes:
       - "${INPUT_DIR}:/data"
       - "${GENERATED_DIR}:/generated-files"
 
-volumes:
-  esdata:
+  redis:
+    container_name: ds_redis
+    image: redis:alpine
+    ports:
+      - 6379:6379

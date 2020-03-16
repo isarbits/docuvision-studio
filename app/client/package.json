@@ -3,17 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@types/node": "^12.0.0",
+    "@appbaseio/reactivesearch": "^3.5.0",
+    "@types/chartist": "^0.9.47",
+    "@types/d3": "^5.7.2",
+    "@types/node": "^13.9.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
-    "http-proxy-middleware": "^1.0.0",
+    "chartist": "^0.11.4",
+    "d3": "^5.15.0",
     "node-sass": "^4.13.1",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "react": "^16.12.0",
+    "react-chartist": "^0.14.3",
     "react-dom": "^16.12.0",
-    "react-scripts": "3.4.0",
-    "searchkit": "^2.4.1-alpha.3",
+    "react-modal": "^3.11.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "^3.4.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {},
@@ -22,7 +28,6 @@
     "watch": "nodemon",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "format": "prettier --write -l \"./src/**/*.{ts,tsx,json,scss}\" && eslint --fix src/ --ext .ts,.tsx",
     "cold": "sed -i \"s:require.resolve('react-dev-utils/webpackHotDevClient'):null:\" node_modules/react-scripts/config/webpack.config.js"
   },
@@ -41,7 +46,6 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:9200/",
   "nodemonConfig": {
     "watch": [
       "src",

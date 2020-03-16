@@ -1,0 +1,39 @@
+@import "styles/colours.scss";
+
+#root {
+    .queue-chart {
+        display: flex;
+        justify-content: space-between;
+
+        .chart-container {
+            padding: 0.5rem;
+        }
+
+        .ct-chart .ct-chart-line {
+            background-color: rgba($blue-darker, 0.2);
+            border-radius: 4px;
+
+            .ct-line {
+                stroke-width: 2px;
+                stroke: $blue;
+            }
+        }
+
+        .flex-row {
+            display: flex;
+        }
+
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .labels {
+            display: flex;
+            flex-direction: column;
+            color: #aaa;
+            font-size: 0.875rem;
+            justify-content: center;
+        }
+    }
+}
