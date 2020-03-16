@@ -41,16 +41,13 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
         const baseDocument = this.convertJobToDocument(job, document);
 
         const pending = [this.indexDocuent(baseDocument)];
-        console.log(`${baseDocument.document.id}: doc ${document?.pages}`);
 
         for (let i = 0; i < document.pageCount; ++i) {
             const page = document.pages[i];
             const pageNumber = page.pageNumber;
 
             pending.push(this.indexPage(baseDocument, pageNumber));
-            console.log(`${baseDocument.document.id}: page ${pageNumber}`);
             pending.push(this.getPageImage(document.id, pageNumber));
-            console.log(`${baseDocument.document.id}: page image ${pageNumber}`);
 
             const wordCount = page?.words?.length;
             for (let index = 0; index < wordCount; index++) {

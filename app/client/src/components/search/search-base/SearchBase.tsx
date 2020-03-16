@@ -33,7 +33,7 @@ export class SearchBase extends React.Component<Props, any> {
             return null;
         }
         if (res.error) {
-            return res.error;
+            return `Error fetching data: ${res.error.message} ${JSON.stringify(res.error)}`;
         }
 
         return (res.data || []).map(page => <PageHit key={page._id} page={page} />) || null;

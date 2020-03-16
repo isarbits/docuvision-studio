@@ -5,7 +5,7 @@ import { Header } from './components/layout/header/Header';
 import { Queues } from './components/queues/Queues';
 import { Search } from './components/search/Search';
 
-export class App extends React.Component<{}, { errors: string[] }> {
+export class App extends React.Component<{}, {}> {
     render() {
         return (
             <BrowserRouter>
