@@ -17,7 +17,7 @@ interface LogError {
 export class ErrorsInterceptor implements NestInterceptor {
     intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
-            catchError(error => {
+            catchError((error) => {
                 if (error.isAxiosError && error.response) {
                     throw new HttpException(error.response.data, error.response.status);
                 }

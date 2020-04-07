@@ -12,6 +12,6 @@ export class ObservableDataInterceptor<T = any> implements NestInterceptor<T, Re
     constructor(@Optional() private readonly key: string = 'data') {}
 
     intercept(_context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-        return next.handle().pipe(map(response => response[this.key]));
+        return next.handle().pipe(map((response) => response[this.key]));
     }
 }

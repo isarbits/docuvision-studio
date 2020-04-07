@@ -26,7 +26,7 @@ export class PageHit extends React.Component<Props, State> {
 
         const imagePath = `${baseUrl}/documents/${page.document.id}/pages/${page.page.pageNumber}/files/pageImage.jpg`;
 
-        const imageNotFound = e => {
+        const imageNotFound = (e) => {
             const img = e.currentTarget;
             img.src = '/imageNotFound.png';
             img.style.margin = '20px';
@@ -35,7 +35,7 @@ export class PageHit extends React.Component<Props, State> {
             img.style.minWidth = '50px';
             img.style.minHeight = '50px';
             img.classList.remove('clickable');
-            img.onclick = e => {
+            img.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
             };

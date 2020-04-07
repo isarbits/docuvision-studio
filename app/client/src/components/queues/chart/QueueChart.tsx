@@ -87,7 +87,7 @@ export class QueueChart extends React.Component<Props, State> {
         this.socket && this.socket.close();
         this.socket = subscribe(
             'queue-stats',
-            data => this.convertToChart(data),
+            (data) => this.convertToChart(data),
             (err, evnt) => {
                 EventBus.emit('queue-disconnect', { err, evnt });
             },
@@ -125,13 +125,13 @@ export class QueueChart extends React.Component<Props, State> {
 
         const diff = length - history.length;
         if (diff > 0) {
-            dataByStateName = dataByStateName.map(q => [...Array(diff).fill(null), ...q]);
+            dataByStateName = dataByStateName.map((q) => [...Array(diff).fill(null), ...q]);
         }
 
         const chartData = {};
         const labels = Array.from(Array(length).keys());
 
-        Object.keys(this.stateToIndex).forEach(state => {
+        Object.keys(this.stateToIndex).forEach((state) => {
             chartData[state] = {
                 labels,
                 series: [
@@ -174,7 +174,7 @@ export class QueueChart extends React.Component<Props, State> {
             return <p>No data</p>;
         }
 
-        const getRate = queue => {
+        const getRate = (queue) => {
             const length = this.props.historySeconds || 60;
             return (queue[this.historyToIndex[length]].m || 0).toFixed(1);
         };

@@ -51,9 +51,9 @@ export class QueueLogs extends React.Component<Props, State> {
         this.socket && this.socket.close();
         this.socket = subscribe(
             'queue-logs',
-            data => {
+            (data) => {
                 if (!this?.props?.types?.length || this.props.types.includes(data.type)) {
-                    this.setState(p => ({ logs: [...p.logs, data].slice(0, 100) }));
+                    this.setState((p) => ({ logs: [...p.logs, data].slice(0, 100) }));
                 }
             },
             (err, evnt) => {

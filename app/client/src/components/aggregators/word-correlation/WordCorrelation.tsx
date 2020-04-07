@@ -37,9 +37,9 @@ export class WordCorrelation extends React.Component<Props, State> {
         })
             .then((response: Response) => {
                 if (response.status < 200 || response.status >= 300) {
-                    return response.json().then(res => console.error(res));
+                    return response.json().then((res) => console.error(res));
                 }
-                response.json().then(results => {
+                response.json().then((results) => {
                     const data: Dataset = { nodes: [{ id: 'query', group: 0 }], links: [] };
 
                     const bucketMax = results.aggregations.documents.buckets.reduce(

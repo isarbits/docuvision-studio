@@ -18,12 +18,12 @@ export const watchFolderAndIndex = (folder: string) => {
     let debounceTimer;
 
     const getDebounced = () =>
-        new Promise(res => {
+        new Promise((res) => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => res(clearTimeout(debounceTimer)), 100);
         });
 
-    const isFile = filename => fs.existsSync(filename) && fs.statSync(filename).isFile();
+    const isFile = (filename) => fs.existsSync(filename) && fs.statSync(filename).isFile();
 
     const fsChangeHandler = async (_op: string, file: string) => {
         if (file) {

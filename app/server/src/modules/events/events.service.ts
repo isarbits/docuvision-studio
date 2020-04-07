@@ -35,7 +35,7 @@ export class EventsService implements OnGatewayConnection, OnGatewayDisconnect {
 
         const listeners = this.subscriptions[channel] || [];
 
-        listeners.forEach(clientId => {
+        listeners.forEach((clientId) => {
             const client = this.connectedClients[clientId];
             if (client?.readyState === OPEN) {
                 client.send(message);
@@ -46,7 +46,7 @@ export class EventsService implements OnGatewayConnection, OnGatewayDisconnect {
     broadcast(channel: string, data: EventData) {
         const message = this.dataToString({ channel, data });
 
-        this.server.clients.forEach(client => {
+        this.server.clients.forEach((client) => {
             if (client.readyState === OPEN) {
                 client.send(message);
             }
@@ -83,7 +83,7 @@ export class EventsService implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(client: Client): any {
         delete this.connectedClients[client.id];
-        (this.subscriptions[client.protocol] ?? []).filter(id => id !== client.id);
+        (this.subscriptions[client.protocol] ?? []).filter((id) => id !== client.id);
         this.loggingService.debug(`OnGatewayDisconnect [${client.protocol}]`, client.id);
     }
 }

@@ -6,7 +6,7 @@ export class Home extends React.Component<{}, { errors: string[] }> {
 
     errorsRef = React.createRef<HTMLDivElement>();
 
-    submit = event => {
+    submit = (event) => {
         event.preventDefault();
 
         const form = event.currentTarget;
@@ -18,12 +18,12 @@ export class Home extends React.Component<{}, { errors: string[] }> {
         fetch(`${baseUrl}/documents`, { method: 'POST', body: data })
             .then((response: Response) => {
                 if (response.status < 200 || response.status >= 300) {
-                    return response.json().then(res => this.setState({ errors: [res.message] }));
+                    return response.json().then((res) => this.setState({ errors: [res.message] }));
                 }
                 console.error(response);
                 // window.location.href = '/queues';
             })
-            .catch(e => alert(e));
+            .catch((e) => alert(e));
     };
 
     render() {

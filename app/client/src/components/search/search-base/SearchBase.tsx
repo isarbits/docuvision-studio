@@ -44,7 +44,7 @@ export class SearchBase extends React.Component<Props, State> {
             return `Error fetching data: ${res.error.message} ${JSON.stringify(res.error)}`;
         }
 
-        return (res.data || []).map(page => <PageHit key={page._id} page={page} />) || null;
+        return (res.data || []).map((page) => <PageHit key={page._id} page={page} />) || null;
     };
 
     private changeView = (name: string) => () => {
@@ -61,7 +61,7 @@ export class SearchBase extends React.Component<Props, State> {
                     app="docuvision_page"
                     url={elasticHost}
                     className="page-search-content-container flex"
-                    transformRequest={e => {
+                    transformRequest={(e) => {
                         if (typeof this?.props?.onQuery === 'function') {
                             this.props.onQuery(e.body);
                         }
@@ -126,7 +126,7 @@ export class SearchBase extends React.Component<Props, State> {
                                 showResultStats={true}
                                 react={{ and: ['QueryComponent', 'FilenameComponent'] }}
                                 renderNoResults={() => <div className="pa-2"> Nothing found </div>}
-                                renderResultStats={stats => (
+                                renderResultStats={(stats) => (
                                     <div className="stats-summary pa-2 fg-grey text-size-3">
                                         {stats.numberOfResults} results ({stats.time} ms)
                                     </div>

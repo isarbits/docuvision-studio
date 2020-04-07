@@ -26,7 +26,7 @@ export const indexAllFiles = async (paths: string[]) => {
     for (const file of walkPaths(paths)) {
         const result = upload(file)
             .then(() => console.log(`Uploaded ${file}`))
-            .catch(error => {
+            .catch((error) => {
                 console.error(`Error processing ${file}`);
                 console.error(error);
             });

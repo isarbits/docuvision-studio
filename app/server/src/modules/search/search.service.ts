@@ -65,7 +65,7 @@ export class SearchService {
     private initializeIndices(): Promise<any> {
         const indices = [{ index: 'logs' }, { index: 'docuvision' }, { index: 'docuvision_page' }, { index: 'docuvision_word' }];
 
-        const createFromSettings = data => this.elasticsearchService.indices.create(data).catch(() => null);
+        const createFromSettings = (data) => this.elasticsearchService.indices.create(data).catch(() => null);
 
         return Promise.all(indices.map(createFromSettings));
     }

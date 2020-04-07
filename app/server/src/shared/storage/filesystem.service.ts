@@ -16,7 +16,7 @@ export class FileSystemService implements StorageInterface {
         return fs.promises
             .writeFile(filename, body, options)
             .then(() => true)
-            .catch(error => {
+            .catch((error) => {
                 console.error(error);
                 return false;
             });

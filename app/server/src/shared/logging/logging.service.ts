@@ -95,7 +95,7 @@ export class LoggingService {
         const { humanFormat, timestamp } = this.formatDate();
         const logType = console[type] || console.log;
 
-        const sourceCol = s => `\x1b[1;36m${s}\x1b[0;0m`;
+        const sourceCol = (s) => `\x1b[1;36m${s}\x1b[0;0m`;
 
         if (source) {
             logType(`${humanFormat} [${sourceCol(source)}]`, colourize(type.toUpperCase()), ...msg);
@@ -129,10 +129,7 @@ export class LoggingService {
         const date = new Date();
         const timestamp = date.getTime();
         // YYYY-MM-DD.hh:mm:ss:
-        const padLeft = (s: string | number, l = 2, p = '0') =>
-            `${Array(l)
-                .fill(p)
-                .join('')}${s}`.slice(-l);
+        const padLeft = (s: string | number, l = 2, p = '0') => `${Array(l).fill(p).join('')}${s}`.slice(-l);
 
         const dateParts = [
             // @prettierignore

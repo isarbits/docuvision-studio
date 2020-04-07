@@ -82,7 +82,7 @@ export class DocuvisionService {
                 break;
             }
 
-            await new Promise(res => setTimeout(res, 1000));
+            await new Promise((res) => setTimeout(res, 1000));
         } while (!maxWaitSeconds || waitedSeconds++ < maxWaitSeconds);
 
         if (response?.data?.status === 'pending') {
@@ -97,7 +97,7 @@ export class DocuvisionService {
 
         return this.httpService.get(uri, this.getConfig()).pipe(
             flatMap(() => Promise.resolve(true)),
-            catchError(err => Promise.resolve([404, 401, 403].includes(err?.status))),
+            catchError((err) => Promise.resolve([404, 401, 403].includes(err?.status))),
         );
     }
 

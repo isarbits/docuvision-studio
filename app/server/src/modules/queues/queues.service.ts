@@ -59,7 +59,7 @@ export class QueuesService {
     empty(queueName: string) {
         const queue = this.getQueueByName(queueName);
         return Promise.all<any>([
-            ...['completed', 'wait', 'active', 'delayed', 'failed'].map(name => queue.clean(0, name as JobStatusClean)),
+            ...['completed', 'wait', 'active', 'delayed', 'failed'].map((name) => queue.clean(0, name as JobStatusClean)),
             queue.empty(),
         ]);
     }

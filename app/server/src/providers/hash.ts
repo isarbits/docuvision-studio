@@ -15,7 +15,7 @@ export const hashFile = (file: string): Promise<string> => {
 };
 
 export const hashBuffer = (file: Buffer): Promise<string> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const hash = createHash('md5');
 
         hash.once('readable', () => resolve(hash.read().toString('hex')));

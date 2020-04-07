@@ -54,7 +54,7 @@ export class DocumentsService {
 
                 return response;
             }),
-            catchError(async error => {
+            catchError(async (error) => {
                 await this.markDocumentFailed(error, md5, Date.now() - start, params.filePath);
                 throw error;
             }),
@@ -62,7 +62,7 @@ export class DocumentsService {
     }
 
     getPageFile(documentId: string, pageNumber: string, file: string): Promise<Buffer | ReadStream> {
-        return this.fileSystemService.getFile(join(paths.assetsDir, documentId, pageNumber, file)).catch(error => {
+        return this.fileSystemService.getFile(join(paths.assetsDir, documentId, pageNumber, file)).catch((error) => {
             if (error?.code === 'ENOENT') {
                 throw new NotFoundException();
             }
@@ -118,7 +118,7 @@ export class DocumentsService {
                 },
             })
             .then(({ body }) => 0 !== body.count)
-            .catch(e => {
+            .catch((e) => {
                 this.loggingService.error(e);
                 return false;
             });

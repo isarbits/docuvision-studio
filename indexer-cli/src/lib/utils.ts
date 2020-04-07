@@ -8,7 +8,7 @@ import * as path from 'path';
  * @param {number}  depth  Max depth (default is recursive)
  *                         Depth = 1 will not recurse into subdirectories
  */
-export const walk = function*(dir: string, depth = -1) {
+export const walk = function* (dir: string, depth = -1) {
     if (depth === 0) {
         return;
     }
@@ -33,7 +33,7 @@ export const walk = function*(dir: string, depth = -1) {
     }
 };
 
-export const walkPaths = function*(paths: string[]) {
+export const walkPaths = function* (paths: string[]) {
     for (const dir of paths) {
         yield* walk(dir);
     }

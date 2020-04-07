@@ -12,7 +12,7 @@ switch (process.argv[2]) {
             process.exit(Number(args.length === 0));
         }
         if (args.includes('-w') || args.includes('--watch')) {
-            args = args.filter(a => !/-w|--watch/.test(a));
+            args = args.filter((a) => !/-w|--watch/.test(a));
             if (args.length > 1) {
                 console.error('Watch mode only supports 1 folder at this time');
                 process.exit(1);
