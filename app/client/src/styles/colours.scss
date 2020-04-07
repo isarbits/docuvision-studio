@@ -110,6 +110,10 @@ $allColours: (
 // fix for "is-colour" only being available through stylesheets
 // #{nth($colour, 1)} - array 1, 2, 3 (1 indexed)
 @each $colour in $allColours {
+    :root {
+        --theme-#{nth($colour, 1)}: #{nth($colour, 2)};
+    }
+
     .bg-#{nth($colour, 1)} {
         background-color: #{nth($colour, 2)};
         color: #{nth($colour, 3)};

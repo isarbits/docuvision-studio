@@ -2,6 +2,7 @@
 const STRINGS = {
     errors_login_invalid: 'Invalid email or password',
     errors_example_exception: 'Example error',
+    errors_invalid_job_data: 'Example error',
 };
 /* eslint-enable @typescript-eslint/camelcase */
 
@@ -9,10 +10,10 @@ const STRINGS = {
 // if value doesn't exist, just return the key
 const handler = {
     get(target, symbol, _receiver) {
-        return target[symbol] || symbol;
         if (typeof target[symbol] === 'string') {
-            return target[symbol] || symbol;
+            return target[symbol];
         }
+        // log missing translation
         return symbol;
     },
 };

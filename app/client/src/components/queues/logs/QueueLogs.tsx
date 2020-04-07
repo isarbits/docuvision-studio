@@ -53,7 +53,7 @@ export class QueueLogs extends React.Component<Props, State> {
             'queue-logs',
             data => {
                 if (!this?.props?.types?.length || this.props.types.includes(data.type)) {
-                    this.setState(p => ({ logs: [...p.logs, data] }));
+                    this.setState(p => ({ logs: [...p.logs, data].slice(0, 100) }));
                 }
             },
             (err, evnt) => {
@@ -82,7 +82,27 @@ export class QueueLogs extends React.Component<Props, State> {
             return <p>Nothing yet</p>;
         }
 
-        return logs.map((log, index) => <p key={`${index}`}>{log.message}</p>);
+        const toggleData = (data: any) => (event: React.SyntheticEvent<HTMLSpanElement>) => {
+            const logDiv = event?.currentTarget?.parentElement;
+            if (!logDiv) {
+                return;
+            }
+            if (logDiv.classList.contains('is-visible')) {
+                logDiv.querySelector('.data').remove();
+            } else {
+                const pre = document.createElement('pre');
+                pre.classList.add('ml-3', 'my-1', 'data');
+                pre.innerText = JSON.stringify(data, null, 2);
+                logDiv.appendChild(pre);
+            }
+            logDiv.classList.toggle('is-visible');
+        };
+
+        return logs.map((log, index) => (
+            <div className="entry" key={`${index}`}>
+                <span onClick={toggleData(log.data)}>{log.message}</span>
+            </div>
+        ));
     };
 
     public render() {

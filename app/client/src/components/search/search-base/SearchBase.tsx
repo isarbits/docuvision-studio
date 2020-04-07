@@ -1,3 +1,4 @@
+import { PageHit } from '../page-search/PageHit';
 import {
     DataSearch,
     MultiList,
@@ -9,7 +10,6 @@ import React from 'react';
 import { elasticHost } from '../../../config';
 
 import './search-base.scss';
-import { PageHit } from './page-search/PageHit';
 import { Hit, Search } from '../../../interfaces/index.d';
 
 type RenderResults = {
@@ -22,12 +22,20 @@ type RenderResults = {
 };
 
 interface Props {
-    children?: (res: RenderResults) => React.ReactNode;
     index?: 'docuvision' | 'docuvision_page' | 'docuvision_word';
     onQuery?: (query: any) => void;
+    changeView?: (name: string) => void;
 }
 
-export class SearchBase extends React.Component<Props, any> {
+interface State {
+    view: string;
+}
+
+export class SearchBase extends React.Component<Props, State> {
+    public state: State = {
+        view: 'page_list',
+    };
+
     private defaultRenderPages = (res: RenderResults) => {
         if (res.loading) {
             return null;
@@ -39,6 +47,13 @@ export class SearchBase extends React.Component<Props, any> {
         return (res.data || []).map(page => <PageHit key={page._id} page={page} />) || null;
     };
 
+    private changeView = (name: string) => () => {
+        this.setState({ view: name });
+        if (typeof this.props.changeView === 'function') {
+            this.props.changeView(name);
+        }
+    };
+
     public render() {
         return (
             <>
@@ -48,11 +63,7 @@ export class SearchBase extends React.Component<Props, any> {
                     className="page-search-content-container flex"
                     transformRequest={e => {
                         if (typeof this?.props?.onQuery === 'function') {
-                            // get the ndjson body and replace page with word index
-                            const query = e.body
-                                .split('\n')[1]
-                                .replace(/"page\.words\.text"/g, '"word.text"');
-                            this.props.onQuery(JSON.parse(query));
+                            this.props.onQuery(e.body);
                         }
                         return e;
                     }}
@@ -66,37 +77,41 @@ export class SearchBase extends React.Component<Props, any> {
                             className="multi-list"
                             showSearch={false}
                             showCheckbox={true}
-                            componentId="Filename"
+                            componentId="FilenameComponent"
                             dataField="document.filename.keyword"
                             renderNoResults={() => <p>No Results Found!</p>}
                             title="Filename"
-                            react={{ and: 'SearchBarSensor' }}
+                            react={{ and: 'QueryComponent' }}
                         />
                     </div>
                     <div className="page-search-content flex-column flex-grow">
                         <div className="page-search-header flex-column">
                             <DataSearch
-                                componentId="Query"
+                                componentId="QueryComponent"
                                 placeholder="Search pages..."
                                 dataField={['document.filename', 'page.words.text']}
+                                react={{ and: 'FilenameComponent' }}
                             />
                         </div>
 
-                        <div className="app-selector pa-2 border-b-grey-light flex ">
-                            <span className="mr-2">Apps:</span>
-                            <div
-                                className="flex-grow flex-justify-space-around"
-                                style={{ maxWidth: '960px' }}
-                            >
-                                {[...Array(5).keys()].map((name, i) => {
-                                    return (
-                                        <strong key={i} className="px-1 underline clickable">
-                                            {`${name}`.repeat(4)}
-                                        </strong>
-                                    );
-                                })}
+                        {typeof this.props.changeView === 'function' && (
+                            <div className="app-selector pa-2 border-b-grey-light flex">
+                                <button
+                                    className="small clear mr-2 px-1 clickable"
+                                    data-selected={this.state.view === 'page_list'}
+                                    onClick={this.changeView('page_list')}
+                                >
+                                    Page List
+                                </button>
+                                <button
+                                    className="small clear mr-2 px-1 clickable"
+                                    data-selected={this.state.view === 'visualize'}
+                                    onClick={this.changeView('visualize')}
+                                >
+                                    Visualize
+                                </button>
                             </div>
-                        </div>
+                        )}
 
                         <div style={{ minHeight: '35px' }} className="border-b-grey">
                             <SelectedFilters showClearAll={true} clearAllLabel="Clear filters" />
@@ -109,15 +124,18 @@ export class SearchBase extends React.Component<Props, any> {
                                 dataField="page"
                                 loader="Loading Results.."
                                 showResultStats={true}
-                                react={{ and: ['SearchBarSensor', 'FilenameSensor'] }}
+                                react={{ and: ['QueryComponent', 'FilenameComponent'] }}
                                 renderNoResults={() => <div className="pa-2"> Nothing found </div>}
-                                onData={console.info}
                                 renderResultStats={stats => (
                                     <div className="stats-summary pa-2 fg-grey text-size-3">
                                         {stats.numberOfResults} results ({stats.time} ms)
                                     </div>
                                 )}
-                                render={this.props.children || this.defaultRenderPages}
+                                render={
+                                    this.props.children
+                                        ? () => this.props.children
+                                        : this.defaultRenderPages
+                                }
                             />
                         </div>
                     </div>

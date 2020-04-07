@@ -9,10 +9,7 @@ export class SearchService {
     private indexWriteQueue: { [index: string]: Promise<any>[] } = {};
 
     constructor(private readonly elasticsearchService: ElasticsearchService) {
-        this.elasticsearchService.indices.create({ index: 'logs' }).catch(() => null);
-        this.elasticsearchService.indices.create({ index: 'docuvision' }).catch(() => null);
-        this.elasticsearchService.indices.create({ index: 'docuvision_page' }).catch(() => null);
-        this.elasticsearchService.indices.create({ index: 'docuvision_word' }).catch(() => null);
+        this.initializeIndices();
     }
 
     search<T = any>(params: RequestParams.Search<T>) {
@@ -63,5 +60,13 @@ export class SearchService {
         this.indexWriteQueue[index].push(launched);
 
         return launched;
+    }
+
+    private initializeIndices(): Promise<any> {
+        const indices = [{ index: 'logs' }, { index: 'docuvision' }, { index: 'docuvision_page' }, { index: 'docuvision_word' }];
+
+        const createFromSettings = data => this.elasticsearchService.indices.create(data).catch(() => null);
+
+        return Promise.all(indices.map(createFromSettings));
     }
 }

@@ -3,7 +3,7 @@ version: "3"
 services:
   app:
     container_name: ds_dev_app
-    image: isarbits/docuvision-studio-app
+    image: "isarbits/docuvision-studio-app:${BUILD_VERSION:-dev}"
     build:
       context: ../app
     restart: always
@@ -24,34 +24,34 @@ services:
 
       - ../app/server/dist:/opt/dist
       - ../app/client/build:/client/build
-    # command: pm2-runtime /opt/pm2/pm2-config-watch.json
-    command: pm2-runtime /opt/pm2/pm2-config-watch.json --only server
+    command: pm2-runtime /opt/pm2/pm2-config-watch.json
+    # command: pm2-runtime /opt/pm2/pm2-config-watch.json --only server
 
-  workers:
-    container_name: ds_dev_workers
-    image: isarbits/docuvision-studio-app
-    build:
-      context: ../app
-    restart: always
-    env_file: ../app/server/.env.example
-    environment:
-      - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
-      - DOCUVISION_HOST=${DOCUVISION_HOST}
-      - WORKERS_CLUSER_AUTO_SCALE=true
-      - WORKERS_CLUSER_MAX=10
-      - OCR_ENGINE=${OCR_ENGINE}
-    network_mode: host
-    depends_on:
-      - es
-      - redis
-    volumes:
-      - ./worker-static:/opt/dist/static
-      - ../app/server/dist:/opt/dist
-    command: pm2-runtime /opt/pm2/pm2-config-watch.json --only workers
+  # workers:
+  #   container_name: ds_dev_workers
+  #   image: "isarbits/docuvision-studio-app:${BUILD_VERSION:-dev}"
+  #   build:
+  #     context: ../app
+  #   restart: always
+  #   env_file: ../app/server/.env.example
+  #   environment:
+  #     - DOCUVISION_APIKEY=${DOCUVISION_APIKEY}
+  #     - DOCUVISION_HOST=${DOCUVISION_HOST}
+  #     - WORKERS_CLUSER_AUTO_SCALE=true
+  #     - WORKERS_CLUSER_MAX=10
+  #     - OCR_ENGINE=${OCR_ENGINE}
+  #   network_mode: host
+  #   depends_on:
+  #     - es
+  #     - redis
+  #   volumes:
+  #     - ./worker-static:/opt/dist/static
+  #     - ../app/server/dist:/opt/dist
+  #   command: pm2-runtime /opt/pm2/pm2-config-watch.json --only workers
 
   indexer:
     container_name: ds_dev_indexer
-    image: isarbits/docuvision-studio-indexer
+    image: "isarbits/docuvision-studio-indexer:${BUILD_VERSION:-dev}"
     build:
       context: ../indexer-cli
     restart: always

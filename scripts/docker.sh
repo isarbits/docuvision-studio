@@ -40,6 +40,7 @@ fi
 
 # echo "docker-compose ${args[@]} $act"
 if [ "$act" == "deploy" ]; then
+  export BUILD_VERSION=${BUILD_VERSION:-latest}
   docker-compose -f docker-compose-dev.yml build && \
   docker-compose -f docker-compose-dev.yml push
 else

@@ -4,6 +4,7 @@ import { Job, Queue } from 'bull';
 import { workers } from 'config';
 
 import { Queues } from '../../../common/constants/queues';
+import { strings } from '../../../common/constants/strings';
 import { WorkerInterface } from '../consumers.d';
 
 interface GetPageImageJobData {
@@ -20,6 +21,10 @@ export class GetPageImageWorker implements WorkerInterface<GetPageImageJobData> 
     }
 
     async work(job: Job<GetPageImageJobData>) {
+        if (!job?.data) {
+            throw new Error(strings.errors_invalid_job_data);
+        }
+
         const { documentId, pageNumber } = job.data;
         const uri = `${workers.serverHost}/documents/${documentId}/pages/${pageNumber}/downloads/pageImage`;
 

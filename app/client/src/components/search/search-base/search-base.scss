@@ -21,4 +21,8 @@
             text-overflow: ellipsis;
         }
     }
+
+    button[data-selected="true"] {
+        border: 1px solid var(--theme-accent);
+    }
 }

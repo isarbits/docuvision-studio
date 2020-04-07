@@ -9,6 +9,7 @@ body,
     font-size: 16px;
 
     button {
+        outline: none;
         padding: 8px 12px;
         border-radius: 4px;
         text-align: center;
@@ -23,9 +24,19 @@ body,
         -o-transition: all 200ms ease;
         -ms-transition: all 200ms ease;
         transition: all 200ms ease;
+        border: 2px solid;
         background-color: white;
         color: black;
-        border: 2px solid;
+
+        &.clear {
+            border: 2px solid rgba(0, 0, 0, 0);
+            background-color: rgba(0, 0, 0, 0);
+            color: inherit;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+        }
 
         &.small,
         &[data-small] {

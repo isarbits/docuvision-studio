@@ -6,10 +6,14 @@
             overflow-y: auto;
             padding: 0.5rem;
 
-            p {
+            div.entry {
                 margin: 0;
                 padding: 0.1rem 0;
                 font-size: 0.875rem;
+
+                span {
+                    cursor: pointer;
+                }
             }
         }
     }

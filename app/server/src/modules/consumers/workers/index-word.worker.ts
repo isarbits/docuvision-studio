@@ -4,6 +4,7 @@ import { Job, Queue } from 'bull';
 import { elasticsearch, workers } from 'config';
 
 import { Queues } from '../../../common/constants/queues';
+import { strings } from '../../../common/constants/strings';
 import { LoggingService } from '../../../shared/logging/logging.service';
 import Docuvision from '../../docuvision/docuvision.d';
 import { IndexDocument, IndexWord, WorkerInterface } from '../consumers.d';
@@ -27,7 +28,11 @@ export class IndexWordWorker implements WorkerInterface<IndexWordJobData> {
     }
 
     async work(job: Job<IndexWordJobData>) {
-        if (job.data.error) {
+        if (!job?.data) {
+            throw new Error(strings.errors_invalid_job_data);
+        }
+
+        if (job?.data?.error) {
             return;
         }
 

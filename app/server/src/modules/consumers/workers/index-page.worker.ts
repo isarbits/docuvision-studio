@@ -4,6 +4,7 @@ import { Job, Queue } from 'bull';
 import { elasticsearch, workers } from 'config';
 
 import { Queues } from '../../../common/constants/queues';
+import { strings } from '../../../common/constants/strings';
 import { LoggingService } from '../../../shared/logging/logging.service';
 import { IndexDocument, IndexPage, WorkerInterface } from '../consumers.d';
 
@@ -24,7 +25,11 @@ export class IndexPageWorker implements WorkerInterface<IndexPageJobData> {
     }
 
     async work(job: Job<IndexPageJobData>) {
-        if (job.data.error) {
+        if (!job?.data) {
+            throw new Error(strings.errors_invalid_job_data);
+        }
+
+        if (job?.data?.error) {
             return;
         }
 

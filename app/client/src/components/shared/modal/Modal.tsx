@@ -11,12 +11,15 @@ interface Props extends ReactModal.props {
 interface State {}
 
 export class Modal extends React.Component<Props, State> {
-    render() {
+    private root = document.getElementById('root');
+
+    public render() {
         return (
             <ReactModal
                 {...this.props}
                 closeTimeoutMS={200}
                 style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}
+                appElement={this.root}
                 contentLabel="modal"
             >
                 <div className="modal-content-inner flex-column">

@@ -7,11 +7,10 @@ import { forkJoin, Observable } from 'rxjs';
 import { catchError, flatMap } from 'rxjs/operators';
 
 import { Queues } from '../../common/constants/queues';
-import { File } from '../../interfaces';
+import { Docuvision, File } from '../../interfaces';
 import { hashBuffer } from '../../providers/hash';
 import { LoggingService } from '../../shared/logging/logging.service';
 import { FileSystemService } from '../../shared/storage/filesystem.service';
-import Docuvision from '../docuvision/docuvision.d';
 import { DocuvisionService } from '../docuvision/docuvision.service';
 import { QueuesService } from '../queues/queues.service';
 import { SearchService } from '../search/search.service';

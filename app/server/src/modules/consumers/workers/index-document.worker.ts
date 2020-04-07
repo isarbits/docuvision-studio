@@ -4,6 +4,7 @@ import { Job, Queue } from 'bull';
 import { elasticsearch, workers } from 'config';
 
 import { Queues } from '../../../common/constants/queues';
+import { strings } from '../../../common/constants/strings';
 import { LoggingService } from '../../../shared/logging/logging.service';
 import { IndexDocument, WorkerInterface } from '../consumers.d';
 
@@ -20,6 +21,10 @@ export class IndexDocumentWorker implements WorkerInterface<IndexDocument> {
     }
 
     async work(job: Job<IndexDocument>) {
+        if (!job?.data) {
+            throw new Error(strings.errors_invalid_job_data);
+        }
+
         const uri = `${workers.serverHost}/search/${elasticsearch.indices.document}/index`;
 
         return this.httpService

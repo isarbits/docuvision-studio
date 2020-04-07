@@ -14,10 +14,11 @@ import { IndexDocumentWorker } from './workers/index-document.worker';
 import { IndexPageWorker } from './workers/index-page.worker';
 import { IndexWordWorker } from './workers/index-word.worker';
 import { PrepareDocumentWorker } from './workers/prepare-document.worker';
+import { WorkerUtilsService } from './workers/worker-utils.service';
 
 const workers = [IndexWordWorker, IndexPageWorker, IndexDocumentWorker, GetPageImageWorker, PrepareDocumentWorker];
 
-const providers = [...workers, QueuesService, { provide: DISABLE_QUEUE_STATS, useValue: true }];
+const providers = [...workers, WorkerUtilsService, QueuesService, { provide: DISABLE_QUEUE_STATS, useValue: true }];
 
 @Module({
     imports: [SearchModule, QueueConnectionsModule, SharedModule, DocuvisionModule, EventsModule],

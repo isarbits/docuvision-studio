@@ -4,6 +4,7 @@ import { statSync } from 'fs';
 import { basename, dirname, extname, sep } from 'path';
 
 import { Queues } from '../../../common/constants/queues';
+import { strings } from '../../../common/constants/strings';
 import { File } from '../../../interfaces';
 import { LoggingService } from '../../../shared/logging/logging.service';
 import Docuvision from '../../docuvision/docuvision.d';
@@ -33,6 +34,11 @@ export class PrepareDocumentWorker implements WorkerInterface<PrepareDocumentJob
     }
 
     async work(job: Job<PrepareDocumentJobData>) {
+        if (!job?.data) {
+            throw new Error(strings.errors_invalid_job_data);
+        }
+
+        this.loggingService.debug(`PREPARING ${job.data.documentId}`);
         const { data } = await this.docuvisionService.pollForCompletion(job.data.documentId);
         if (data.errors) {
             return this.queuesService.publish('processing', Queues.INDEX_DOCUMENT, { ...data, failed: true });
