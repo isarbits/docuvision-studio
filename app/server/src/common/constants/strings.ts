@@ -2,7 +2,7 @@
 const STRINGS = {
     errors_login_invalid: 'Invalid email or password',
     errors_example_exception: 'Example error',
-    errors_invalid_job_data: 'Example error',
+    errors_invalid_job_data: 'Invalid job data',
 };
 /* eslint-enable @typescript-eslint/camelcase */
 
