@@ -18,17 +18,17 @@
     },
     "dependencies": {
         "chokidar": "^3.3.1",
-        "config": "^3.2.5",
+        "config": "^3.3.1",
         "dotenv": "^8.2.0",
         "superagent": "^5.2.2"
     },
     "devDependencies": {
-        "@types/node": "^13.9.0",
-        "@typescript-eslint/eslint-plugin": "^2.24.0",
-        "@typescript-eslint/parser": "^2.24.0",
+        "@types/node": "^13.11.0",
+        "@typescript-eslint/eslint-plugin": "^2.27.0",
+        "@typescript-eslint/parser": "^2.27.0",
         "eslint": "^6.8.0",
         "nodemon": "^2.0.2",
-        "prettier": "^1.18.2",
+        "prettier": "^2.0.4",
         "typescript": "^3.7.5"
     },
     "engines": {
