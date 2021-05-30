@@ -40,7 +40,7 @@
         "rxjs": "^6.5.5",
         "source-map-support": "^0.5.16",
         "uuid": "^7.0.3",
-        "ws": "^7.2.3"
+        "ws": "^7.4.6"
     },
     "devDependencies": {
         "@types/bull": "^3.12.1",
