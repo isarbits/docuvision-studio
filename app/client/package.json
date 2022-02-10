@@ -11,7 +11,7 @@
     "@types/react-dom": "^16.9.6",
     "chartist": "^0.11.4",
     "d3": "^5.15.1",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "nodemon": "^2.0.2",
     "prettier": "^2.0.4",
     "react": "^16.13.1",
